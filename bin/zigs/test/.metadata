@@ -1,0 +1,6 @@
+{
+	"version" : "1.3.3.7",
+	"zigVersion" : "1",
+	"command" : "c:\\windows\\system32\\calc.exe",
+	"name" : "test",
+}
