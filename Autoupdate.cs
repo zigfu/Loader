@@ -38,7 +38,12 @@ namespace Loader
             WebResponse result = get.GetResponse();
             using (Stream file = result.GetResponseStream()) {
                 using (FileStream f = File.Create(tempName)) {
-                    file.CopyTo(f);
+                    //file.CopyTo(f); //.net 4 only :(
+                    byte[] buffer = new byte[32768];
+                    int read;
+                    while ((read = file.Read(buffer, 0, buffer.Length)) > 0) {
+                        f.Write(buffer, 0, read);
+                    }
                 }
             }
 
