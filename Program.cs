@@ -1,15 +1,91 @@
-﻿using System;
+﻿//
+// NOTE: To whoever's maintaining this code - Sorry (especially if it's me)
+//
+using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Net;
 using Ionic.Zip;
+using System.Runtime.Remoting;
+using System.Runtime.InteropServices;
+using System.Windows.Forms;
+
 
 namespace Loader
 {
+    class FullscreenNotifier : Form
+    {
+        private uint CallBackMessage;
+        public FullscreenNotifier()
+        {
+            FullscreenAppOpen = false;
+            // make the window not appear in the task bar, set it hopefully out of the screen
+            // (will clean this up to make it really invisible sometime in the future)
+            FormBorderStyle = FormBorderStyle.FixedToolWindow;
+            ShowInTaskbar = false;
+            StartPosition = FormStartPosition.Manual;
+            Location = new System.Drawing.Point(-4000, -4000);
+            Size = new System.Drawing.Size(1, 1); 
+
+            this.Load += new EventHandler(FullscreenNotifier_Loaded);
+        }
+
+        void FullscreenNotifier_Loaded(object sender, EventArgs e)
+        {
+            APPBARDATA appBar = new APPBARDATA();
+            appBar.cbSize = Marshal.SizeOf(appBar);
+            appBar.hWnd = this.Handle;
+
+            // Define a new window message that is guaranteed to be 
+            // unique throughout the system.
+            const string Message = "ShitReceiveFullScreenNotification";
+            CallBackMessage = NativeMethod.RegisterWindowMessage(Message);
+            if (CallBackMessage == 0) {
+                throw new Exception(":(");
+            }
+
+            // Register a new appbar and specifies the message identifier 
+            // that the system should use to send it notification 
+            // messages. The call returns FALSE if an error occurs or if 
+            // the full screen notification is already enabled.
+            appBar.uCallbackMessage = CallBackMessage;
+
+
+            if (NativeMethod.SHAppBarMessage(ABMsg.ABM_NEW, ref appBar) == 0) {
+                throw new Exception("SHAppBarMessage failed");
+            }
+
+        }
+
+        public bool FullscreenAppOpen { get; private set; }
+
+        protected override void WndProc(ref Message m)
+        {
+            if (m.Msg == this.CallBackMessage) {
+                if (m.WParam.ToInt32() == (int)ABNotify.ABN_FULLSCREENAPP) {
+                    FullscreenAppOpen = (m.LParam != IntPtr.Zero);
+
+                    Console.WriteLine("A full-screen application is " +
+                        (FullscreenAppOpen ? "opening" : "closing"));
+                }
+            }
+
+            base.WndProc(ref m);
+        }
+    }
+
     class Program
     {
+
+
+        [DllImport("user32.dll")]
+        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        [DllImport("user32", CharSet = CharSet.Ansi, SetLastError = true, ExactSpelling = true)]
+        internal static extern int AttachThreadInput(int idAttach, int idAttachTo, int fAttach);
+
         static void Main(string[] args)
         {
             //testAutoUpdate(args);
@@ -21,8 +97,67 @@ namespace Loader
 
             //TestMetadata();
 
+            //TestRunZig();
+
+            //TestRunZig();
+            if (args[0] == "server") {
+                Console.WriteLine("Server! Hit enter to exit!");
+                string RootProgram = @"c:\windows\system32\calc.exe";
+                if (args.Length > 1) {
+                    RootProgram = args[1];
+                }
+
+                FullscreenNotifier f = new FullscreenNotifier();
+                f.Show();
+
+                Console.WriteLine("Running Launcher: {0}", RootProgram);
+                var proc = System.Diagnostics.Process.Start(RootProgram);
+                ObjRef proxy = LoaderLib.LoaderAPI.StartServer(12345, f.Handle, delegate(object sender, LoaderLib.CreateProcessEventArgs e) {
+                    Console.WriteLine("CreateProcess: {0}, in dir: {1}", e.Command, e.Path);
+                    ShowWindow(proc.MainWindowHandle, 11); // magic number = SW_FORCEMINIMIZE
+
+                    //TODO: ugh (change to event instead of polling)
+                    while (f.FullscreenAppOpen) {
+                        System.Threading.Thread.Sleep(100);
+                    }
+
+                    var newProc = System.Diagnostics.Process.Start(e.Command);
+                    newProc.EnableRaisingEvents = true;
+                    newProc.Exited += new EventHandler(delegate(object sender2, EventArgs e2) {
+                        ShowWindow(proc.MainWindowHandle, 9); // magic number = SW_SHOW
+                    });
+                    Console.WriteLine("done with callback");
+
+                });
+
+                //TODO: fix somehow
+                //f.HandleCreated += delegate(object s, EventArgs e) { (proxy.GetRealObject() as LoaderLib.LoaderAPI).ServerWindowHandle = f.Handle; }
+
+                //Console.ReadLine();
+                Application.Run(f); 
+
+            }
+            if (args[0] == "client") {
+                Console.WriteLine("Client! Invoking!");
+                LoaderLib.LoaderAPI.ConnectToServer(12345).LaunchProcess(@"c:\windows\system32\notepad.exe", "shit");
+            }
+        }
+
+
+
+        private static void TestRunZig()
+        {
+            OpenNIListener backgroundListener = new OpenNIListener();
+
             ZigDB zdb = new ZigDB("zigs");
+            EventHandler<OpenNI.GestureRecognizedEventArgs> shit = delegate(object sender, OpenNI.GestureRecognizedEventArgs e) {
+                zdb.Zigs["test"].KillProcess();
+            };
+            backgroundListener.Gesture.GestureRecognized += shit;
+            backgroundListener.Start();
             zdb.Zigs["test"].Launch();
+            backgroundListener.Gesture.GestureRecognized -= shit;
+
         }
 
         private static void TestMetadata()
