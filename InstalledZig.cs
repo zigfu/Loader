@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.Diagnostics;
 
 namespace Loader
 {
@@ -20,14 +21,41 @@ namespace Loader
 
         public string Name { get { return md.Name; } }
 
+        Process RunningProcess;
+        public void KillProcess()
+        {
+            lock (this) {
+                if (RunningProcess != null) {
+                    //TODO: send the running process some message to tell it to quit
+                    RunningProcess.Kill();
+                    RunningProcess = null;
+                }
+            }
+        }
+
+
         public void Launch()
         {
-            System.Diagnostics.ProcessStartInfo psi = new System.Diagnostics.ProcessStartInfo(md.Command);
-            psi.WorkingDirectory = InstallPath;
-            //Console.WriteLine("Take off every zig!");
-            var process = System.Diagnostics.Process.Start(psi);
-            process.WaitForExit();
+            lock (this) {
+                if (null != RunningProcess) {
+                    return;
+                }
+                ProcessStartInfo psi = new ProcessStartInfo(md.Command);
+                psi.WorkingDirectory = InstallPath;
+                //Console.WriteLine("Take off every zig!");
+                RunningProcess = Process.Start(psi);
+            }
+            //TODO: ugly as hell, do better locking mechanism
+            var proc = RunningProcess;
+            RunningProcess.WaitForExit();
+            lock (this) {
+                if (proc == RunningProcess) {
+                    RunningProcess = null;
+                }
+            }
             //Console.WriteLine("done with process");
         }
+
+
     }
 }
