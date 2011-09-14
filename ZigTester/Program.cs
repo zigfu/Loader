@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Net;
 using ZigLib;
+using System.IO;
 namespace ZigTester
 {
     class Program
@@ -16,7 +18,8 @@ namespace ZigTester
                 last = zig;
             }
             Console.WriteLine("Network Zigs:");
-            foreach (RemoteZig zig in ZigLib.ZigLib.EnumerateRemoteZigs()) {
+            WebRequest wr = WebRequest.Create("http://django.zigfu.com:8888/everyzig");
+            foreach (RemoteZig zig in ZigLib.ZigLib.EnumerateRemoteZigs(new StreamReader(wr.GetResponse().GetResponseStream()).ReadToEnd())) {
                 Console.WriteLine(zig);
             }
             if (!((args.Length > 0) && (args[0] == "shit"))) {

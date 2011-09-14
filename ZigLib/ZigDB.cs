@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Collections;
 
 namespace ZigLib
 {
@@ -11,7 +12,7 @@ namespace ZigLib
 
         public Dictionary<string, InstalledZig> Zigs { get; private set; }
 
-        public ZigDB(string ZigDir, string RemoteZigURL)
+        public ZigDB(string ZigDir)
         {
             RootDir = ZigDir;
             // TODO: provide a way to order items
@@ -20,8 +21,6 @@ namespace ZigLib
                 InstalledZig iz = new InstalledZig(dir);
                 Zigs[iz.Metadata.Name] = iz;
             }
-
-            //TODO: remote part of things
         }
 
         public IEnumerable<InstalledZig> EnumerateInstalledZigs()
@@ -29,9 +28,14 @@ namespace ZigLib
             return Zigs.Values;
         }
 
-        public IEnumerable<RemoteZig> EnumerateRemoteZigs()
+        public IEnumerable<RemoteZig> EnumerateRemoteZigs(string zigsJson)
         {
-            return new List<RemoteZig>(); //TODO: real implementation!
+            Hashtable ht = (Hashtable)JSON.JsonDecode(zigsJson);
+            List<RemoteZig> output = new List<RemoteZig>();
+            foreach (object entry in (ArrayList)ht["zigs"]) {
+                output.Add(new RemoteZig(entry as Hashtable));
+            }
+            return output; //TODO: real implementation!
         }
 
         public void InstallZig(RemoteZig zig)

@@ -8,7 +8,7 @@ namespace ZigLib
 	public class ZigLib
 	{
         //TODO: ugh
-        private static ZigDB db = new ZigDB("Zigs", "http://django.zigfu.com:8888/everyzig/");
+        private static ZigDB db = new ZigDB("Zigs");
 
 
 		public static IEnumerable<InstalledZig> EnumerateInstalledZigs()
@@ -16,9 +16,9 @@ namespace ZigLib
 			return db.EnumerateInstalledZigs();
 		}
 
-        public static IEnumerable<RemoteZig> EnumerateRemoteZigs()
+        public static IEnumerable<RemoteZig> EnumerateRemoteZigs(string APIData)
 		{
-            return db.EnumerateRemoteZigs();
+            return db.EnumerateRemoteZigs(APIData);
 		}
 		
 		public static void InstallZig(RemoteZig zigToInstall)

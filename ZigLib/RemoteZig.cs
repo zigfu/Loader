@@ -16,12 +16,15 @@ namespace ZigLib
             this.Metadata = Metadata;
         }
 
-        public RemoteZig(string RawJSON)
+        public RemoteZig(Hashtable DecodedJSON)
         {
-            Hashtable props = JSON.JsonDecode(RawJSON) as Hashtable;
-            RemoteURI = (string)props["dl_url"];
-            Metadata = new ZigMetadata(props);
+            RemoteURI = (string)DecodedJSON["dl_url"];
+            Metadata = new ZigMetadata(DecodedJSON);
         }
 
+        public override string ToString()
+        {
+            return string.Format("RemoteZig: {0}, download URI: {1}", Metadata.Name, RemoteURI);
+        }
     }
 }
