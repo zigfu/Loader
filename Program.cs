@@ -101,7 +101,7 @@ namespace Loader
 
             //TestRunZig();
             if (args[0] == "server") {
-                Console.WriteLine("Server! Hit enter to exit!");
+                Console.WriteLine("Server! Use Ctrl-C to exit!");
                 string RootProgram = @"c:\windows\system32\calc.exe";
                 if (args.Length > 1) {
                     RootProgram = args[1];
@@ -112,7 +112,7 @@ namespace Loader
 
                 Console.WriteLine("Running Launcher: {0}", RootProgram);
                 var proc = System.Diagnostics.Process.Start(RootProgram);
-                ObjRef proxy = LoaderLib.LoaderAPI.StartServer(12345, f.Handle, delegate(object sender, LoaderLib.CreateProcessEventArgs e) {
+                var SharedObject = LoaderLib.LoaderAPI.StartServer(f.Handle, delegate(object sender, LoaderLib.CreateProcessEventArgs e) {
                     Console.WriteLine("CreateProcess: {0}, in dir: {1}", e.Command, e.Path);
                     ShowWindow(proc.MainWindowHandle, 11); // magic number = SW_FORCEMINIMIZE
 
@@ -130,16 +130,14 @@ namespace Loader
 
                 });
 
-                //TODO: fix somehow
-                //f.HandleCreated += delegate(object s, EventArgs e) { (proxy.GetRealObject() as LoaderLib.LoaderAPI).ServerWindowHandle = f.Handle; }
+                f.HandleCreated += delegate(object s, EventArgs e) { SharedObject.ServerWindowHandle = f.Handle; };
 
-                //Console.ReadLine();
                 Application.Run(f); 
 
             }
             if (args[0] == "client") {
                 Console.WriteLine("Client! Invoking!");
-                LoaderLib.LoaderAPI.ConnectToServer(12345).LaunchProcess(@"c:\windows\system32\notepad.exe", "shit");
+                LoaderLib.LoaderAPI.ConnectToServer().LaunchProcess(@"c:\windows\system32\notepad.exe", "shit");
             }
         }
 
