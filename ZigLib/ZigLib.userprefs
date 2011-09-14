@@ -1,8 +1,11 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="ZigLib.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Release" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="..\..\..\Zigfu\Loader\ZigLib\InstalledZig.cs">
     <Files>
-      <File FileName="ZigLib.cs" Line="47" Column="3" />
+      <File FileName="ZigLib.cs" Line="43" Column="1" />
+      <File FileName="..\..\..\Zigfu\Loader\ZigLib\InstalledZig.cs" Line="50" Column="1" />
+      <File FileName="..\..\..\Zigfu\Loader\ZigLib\RemoteZig.cs" Line="3" Column="1" />
+      <File FileName="..\..\..\Zigfu\Loader\ZigLib\ZigDB.cs" Line="3" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
