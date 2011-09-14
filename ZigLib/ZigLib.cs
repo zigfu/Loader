@@ -1,53 +1,41 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace ZigLib
 {
-	public class ZigMetadata
-	{
-		public string name;
-		public string developer;
-		public string description;
-		public string thumbnail_uri;
-	}
-	
-	public class InstalledZig
-	{
-		ZigMetadata metadata;
-		string path;
-	}
-	
-	public class RemoteZig
-	{
-		ZigMetadata metadata;
-		string zig_uri;
-	}
-	
+
 	public class ZigLib
 	{
-		public static List<InstalledZig> EnumerateInstalledZigs()
+        //TODO: ugh
+        private static ZigDB db = new ZigDB("Zigs", "http://django.zigfu.com:8888/everyzig/");
+
+
+		public static IEnumerable<InstalledZig> EnumerateInstalledZigs()
 		{
-			return new List<InstalledZig>();
+			return db.EnumerateInstalledZigs();
 		}
-		
-		public static List<RemoteZig> EnumerateRemoteZigs()
+
+        public static IEnumerable<RemoteZig> EnumerateRemoteZigs()
 		{
-			return new List<RemoteZig>();
+            return db.EnumerateRemoteZigs();
 		}
 		
 		public static void InstallZig(RemoteZig zigToInstall)
 		{
-			
+            db.InstallZig(zigToInstall);
 		}
+
 		
+
 		public static void LaunchZig(InstalledZig zigToLaunch)
 		{
-			
+            zigToLaunch.Launch();
 		}
 		
 		public static void RemoveZig(InstalledZig zigToRemove)
 		{
-			
+			//TODO
 		}
 	}
 }
