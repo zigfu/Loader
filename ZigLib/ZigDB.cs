@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Collections;
+using Ionic.Zip;
 
 namespace ZigLib
 {
@@ -37,10 +38,33 @@ namespace ZigLib
             }
             return output; //TODO: real implementation!
         }
-
-        public void InstallZig(RemoteZig zig)
+        
+        public InstalledZig InstallZig(string PathToZigFile)
         {
-            //TODO:!
+            //TODO: Make sure it's a valid zig file (extract metadata, see that it's okay)
+            //TODO: check for overwrites!
+            string OutDir = Path.Combine(RootDir, Path.GetFileName(PathToZigFile));
+            CreateDirRecursive(new DirectoryInfo(OutDir));
+            ExtractZip(PathToZigFile, OutDir);
+            InstalledZig iz = new InstalledZig(OutDir);
+            Zigs[iz.Metadata.Name] = iz;
+            return iz;
+        }
+
+        private static void CreateDirRecursive(DirectoryInfo inf) {
+            if (inf.Parent != null) {
+                CreateDirRecursive(inf.Parent);
+            }
+            if (!inf.Exists) {
+                inf.Create();
+            }
+        }
+
+        private static void ExtractZip(string InPath, string OutPath)
+        {
+            using (ZipFile z = ZipFile.Read(InPath)) {
+                z.ExtractAll(OutPath, ExtractExistingFileAction.OverwriteSilently); // TODO: handle errors?
+            }
         }
     }
 }

@@ -21,9 +21,9 @@ namespace ZigLib
             return db.EnumerateRemoteZigs(APIData);
 		}
 		
-		public static void InstallZig(RemoteZig zigToInstall)
+		public static InstalledZig InstallZig(string localZigPath)
 		{
-            db.InstallZig(zigToInstall);
+            return db.InstallZig(localZigPath);
 		}
 
 		
