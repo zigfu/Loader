@@ -66,7 +66,7 @@
     <Compile Include="ZigDB.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\LoaderLib\LoaderLib.csproj">
+    <ProjectReference Include="LoaderLib\LoaderLib.csproj">
       <Project>{EEACD462-13D2-4CF9-A249-BC9CD6A91079}</Project>
       <Name>LoaderLib</Name>
     </ProjectReference>
