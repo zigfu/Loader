@@ -22,7 +22,7 @@ namespace ZigTester
             foreach (RemoteZig zig in ZigLib.ZigLib.EnumerateRemoteZigs(new StreamReader(wr.GetResponse().GetResponseStream()).ReadToEnd())) {
                 Console.WriteLine(zig);
             }
-            if (!((args.Length > 0) && (args[0] == "shit"))) {
+            if ((args.Length > 0) && (args[0] == "shit")) {
                 if (null != last) {
                     Console.WriteLine("Doing shit (Launching last enumerated zig)");
                     last.Launch();
@@ -31,6 +31,14 @@ namespace ZigTester
                     Console.WriteLine("Sorry, but the princess is in another castle (there are no installed zigs)");
                 }
             }
+            else {
+                if (args.Length > 0) {
+                    Console.WriteLine("Installing Zig File: " + args[0]);
+                    InstalledZig newZig = ZigLib.ZigLib.InstallZig(args[0]);
+                    Console.WriteLine("New Zig: {0}", newZig);
+                }
+            }
+
         }
     }
 }
