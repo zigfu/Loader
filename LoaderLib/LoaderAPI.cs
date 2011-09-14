@@ -18,6 +18,8 @@ namespace LoaderLib
     
     public class LoaderAPI : MarshalByRefObject
     {
+        const int port = 32123;
+
         private event EventHandler<CreateProcessEventArgs> ServerCB;
         public LoaderAPI(EventHandler<CreateProcessEventArgs> callback)
         {
@@ -32,7 +34,7 @@ namespace LoaderLib
 
         public IntPtr ServerWindowHandle;
 
-        public static LoaderAPI ConnectToServer(int port)
+        public static LoaderAPI ConnectToServer()
         {
    			string url = string.Format(@"tcp://LocalHost:{0}/LoaderAPI", port);
 			BinaryClientFormatterSinkProvider clientProvider = 
@@ -58,7 +60,7 @@ namespace LoaderLib
             return obj as LoaderAPI;
         }
 
-        public static ObjRef StartServer(int port, IntPtr WindowHandle, EventHandler<CreateProcessEventArgs> callback)
+        public static LoaderAPI StartServer(IntPtr WindowHandle, EventHandler<CreateProcessEventArgs> callback)
         {
 			
 			BinaryClientFormatterSinkProvider clientProvider = null;
@@ -88,7 +90,8 @@ namespace LoaderLib
 			// accesses a specific service on a remote server.
             LoaderAPI api = new LoaderAPI(callback);
             api.ServerWindowHandle = WindowHandle; //TODO: do this on HandleCreated event to ensure the right handle is passed
-            return RemotingServices.Marshal(api, "LoaderAPI");
+            RemotingServices.Marshal(api, "LoaderAPI");
+            return api;
             //RemotingConfiguration.RegisterWellKnownServiceType(
             //        typeof(LoaderAPI), 
             //        "LoaderAPI", 
