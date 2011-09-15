@@ -18,9 +18,15 @@ namespace ZigLib
             RootDir = ZigDir;
             // TODO: provide a way to order items
             Zigs = new Dictionary<string, InstalledZig>();
-            foreach (string dir in Directory.GetDirectories(ZigDir)) {
-                InstalledZig iz = new InstalledZig(dir);
-                Zigs[iz.Metadata.Name] = iz;
+            try {
+                foreach (string dir in Directory.GetDirectories(ZigDir)) {
+                    InstalledZig iz = new InstalledZig(dir);
+                    Zigs[iz.Metadata.Name] = iz;
+                }
+            }
+            catch (DirectoryNotFoundException) {
+                //zig dir doesn't exist - create empty zig dir
+                Directory.CreateDirectory(RootDir);
             }
         }
 
