@@ -95,20 +95,21 @@ namespace Loader
 
             //testVersionObject();
 
-            if (args[0] == "client") {
-                Console.WriteLine("Client! Invoking!");
-                LoaderLib.LoaderAPI.ConnectToServer().LaunchProcess(@"c:\windows\system32\notepad.exe", "shit");
-                return;
-            }
 
-            Console.WriteLine("Server! Use Ctrl-C to exit!");
             System.Diagnostics.Process proc = null;
             if (args.Length > 0) {
-                string RootProgram = args[1];
+                string RootProgram = args[0];
+                if (RootProgram == "client") {
+                    Console.WriteLine("Client! Invoking!");
+                    LoaderLib.LoaderAPI.ConnectToServer().LaunchProcess(@"c:\windows\system32\notepad.exe", "shit");
+                    return;
+                }
+                Console.WriteLine("Server! Use Ctrl-C to exit!");
                 Console.WriteLine("Running Launcher: {0}", RootProgram);
                 proc = System.Diagnostics.Process.Start(RootProgram);
             }
             else {
+                Console.WriteLine("Server! Use Ctrl-C to exit!");
                 Console.WriteLine("Assuming launcher already running");
             }
 
