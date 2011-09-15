@@ -26,7 +26,10 @@ namespace ZigLib
             return db.InstallZig(localZigPath);
 		}
 
-		
+        public static bool IsZigInstalled(RemoteZig zig)
+        {
+            return db.IsInstalled(zig);
+        }
 
 		public static void LaunchZig(InstalledZig zigToLaunch)
 		{

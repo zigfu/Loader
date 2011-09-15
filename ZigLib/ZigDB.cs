@@ -45,6 +45,11 @@ namespace ZigLib
             //TODO: remove installed zigs from the list according to some ID parameter
             return output; 
         }
+
+        public bool IsInstalled(RemoteZig zig)
+        {
+            return Zigs.ContainsKey(zig.Metadata.Name); //TODO: change on adding ID to zigs
+        }
         
         public InstalledZig InstallZig(string PathToZigFile)
         {
