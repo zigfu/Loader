@@ -4,7 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
-using System.Runtime.Remoting.Channels.Tcp;
+//using System.Runtime.Remoting.Channels.Tcp;
+using System.Runtime.Remoting.Channels.Ipc;
 using System.Runtime.Remoting.Services;
 using System.Collections;
 
@@ -36,7 +37,8 @@ namespace LoaderLib
 
         public static LoaderAPI ConnectToServer()
         {
-   			string url = string.Format(@"tcp://LocalHost:{0}/LoaderAPI", port);
+   			//string url = string.Format(@"tcp://LocalHost:{0}/LoaderAPI", port);
+            string url = string.Format(@"ipc://LoaderProcess/LoaderAPI", port);
 			BinaryClientFormatterSinkProvider clientProvider = 
 				new BinaryClientFormatterSinkProvider();
 
@@ -51,8 +53,8 @@ namespace LoaderLib
 			props["name"] = System.Guid.NewGuid().ToString();
 			props["typeFilterLevel"] = System.Runtime.Serialization.Formatters.TypeFilterLevel.Full;
 				
-			TcpChannel chan = 
-				new TcpChannel(props, clientProvider, serverProvider);
+			IpcChannel chan = 
+				new IpcChannel(props, clientProvider, serverProvider);
 
    			ChannelServices.RegisterChannel(chan, false);
 
@@ -76,11 +78,12 @@ namespace LoaderLib
 			/*
 				* Client and server must use the SAME port
 				* */
-			props["port"] = port;
+			//props["port"] = port;
+            props["portName"] = "LoaderProcess";
 			props["typeFilterLevel"] = System.Runtime.Serialization.Formatters.TypeFilterLevel.Full;
 				
-			TcpChannel chan = 
-				new TcpChannel(props, clientProvider, serverProvider);
+			IpcChannel chan = 
+				new IpcChannel(props, clientProvider, serverProvider);
 
 			ChannelServices.RegisterChannel(chan, false);
 	
