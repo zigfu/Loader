@@ -95,88 +95,55 @@ namespace Loader
 
             //testVersionObject();
 
-            //TestMetadata();
-
-            //TestRunZig();
-
-            //TestRunZig();
-            if (args[0] == "server") {
-                Console.WriteLine("Server! Use Ctrl-C to exit!");
-                string RootProgram = @"c:\windows\system32\calc.exe";
-                if (args.Length > 1) {
-                    RootProgram = args[1];
-                }
-
-                FullscreenNotifier f = new FullscreenNotifier();
-                f.Show();
-
-                Console.WriteLine("Running Launcher: {0}", RootProgram);
-                var proc = System.Diagnostics.Process.Start(RootProgram);
-                var SharedObject = LoaderLib.LoaderAPI.StartServer(f.Handle, delegate(object sender, LoaderLib.CreateProcessEventArgs e) {
-                    Console.WriteLine("CreateProcess: {0}, in dir: {1}", e.Command, e.Path);
-                    ShowWindow(proc.MainWindowHandle, 11); // magic number = SW_FORCEMINIMIZE
-
-                    //TODO: ugh (change to event instead of polling)
-                    while (f.FullscreenAppOpen) {
-                        System.Threading.Thread.Sleep(100);
-                    }
-
-                    var newProc = System.Diagnostics.Process.Start(e.Command);
-                    newProc.EnableRaisingEvents = true;
-                    newProc.Exited += new EventHandler(delegate(object sender2, EventArgs e2) {
-                        ShowWindow(proc.MainWindowHandle, 9); // magic number = SW_SHOW
-                    });
-                    Console.WriteLine("done with callback");
-
-                });
-
-                f.HandleCreated += delegate(object s, EventArgs e) { SharedObject.ServerWindowHandle = f.Handle; };
-
-                Application.Run(f); 
-
-            }
             if (args[0] == "client") {
                 Console.WriteLine("Client! Invoking!");
                 LoaderLib.LoaderAPI.ConnectToServer().LaunchProcess(@"c:\windows\system32\notepad.exe", "shit");
+                return;
             }
+
+            Console.WriteLine("Server! Use Ctrl-C to exit!");
+            System.Diagnostics.Process proc = null;
+            if (args.Length > 0) {
+                string RootProgram = args[1];
+                Console.WriteLine("Running Launcher: {0}", RootProgram);
+                proc = System.Diagnostics.Process.Start(RootProgram);
+            }
+            else {
+                Console.WriteLine("Assuming launcher already running");
+            }
+
+            FullscreenNotifier f = new FullscreenNotifier();
+            f.Show();
+
+            var SharedObject = LoaderLib.LoaderAPI.StartServer(f.Handle, delegate(object sender, LoaderLib.CreateProcessEventArgs e) {
+                Console.WriteLine("CreateProcess: {0}, in dir: {1}", e.Command, e.Path);
+                if (proc != null) {
+                    ShowWindow(proc.MainWindowHandle, 11); // magic number = SW_FORCEMINIMIZE
+                }
+
+                //TODO: ugh (change to event instead of polling)
+                while (f.FullscreenAppOpen) {
+                    System.Threading.Thread.Sleep(100);
+                }
+
+                var newProc = System.Diagnostics.Process.Start(e.Command);
+                newProc.EnableRaisingEvents = true;
+                newProc.Exited += new EventHandler(delegate(object sender2, EventArgs e2) {
+                    if (proc != null) {
+                        ShowWindow(proc.MainWindowHandle, 9); // magic number = SW_SHOW
+                    }
+                });
+                Console.WriteLine("done with callback");
+
+            });
+
+            f.HandleCreated += delegate(object s, EventArgs e) { SharedObject.ServerWindowHandle = f.Handle; };
+
+            Application.Run(f); 
+
         }
 
 
-
-        private static void TestRunZig()
-        {
-            OpenNIListener backgroundListener = new OpenNIListener();
-
-            ZigDB zdb = new ZigDB("zigs");
-            EventHandler<OpenNI.GestureRecognizedEventArgs> shit = delegate(object sender, OpenNI.GestureRecognizedEventArgs e) {
-                zdb.Zigs["test"].KillProcess();
-            };
-            backgroundListener.Gesture.GestureRecognized += shit;
-            backgroundListener.Start();
-            zdb.Zigs["test"].Launch();
-            backgroundListener.Gesture.GestureRecognized -= shit;
-
-        }
-
-        private static void TestMetadata()
-        {
-            foreach (string md in Directory.GetFiles(".", "zig_md*.txt")) {
-                printMetadata(md);
-            }
-        }
-
-        private static void printMetadata(string path)
-        {
-            try {
-                Metadata md = Metadata.FromFile(path);
-                Console.WriteLine("Loaded Metadata from file " + path);
-                Console.WriteLine(md);
-            }
-            catch (Exception ex) {
-                Console.WriteLine("Failed to load Metadata in file {0}. Exception:", path);
-                Console.WriteLine(ex);
-            }
-        }
 
         private static void testVersionObject()
         {
