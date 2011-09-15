@@ -21,7 +21,7 @@ namespace ZigLib
             try {
                 foreach (string dir in Directory.GetDirectories(ZigDir)) {
                     InstalledZig iz = new InstalledZig(dir);
-                    Zigs[iz.Metadata.Name] = iz;
+                    Zigs[iz.Metadata.Name] = iz; //TODO: use metadata ID or something like that
                 }
             }
             catch (DirectoryNotFoundException) {
@@ -42,12 +42,14 @@ namespace ZigLib
             foreach (object entry in (ArrayList)ht["zigs"]) {
                 output.Add(new RemoteZig(entry as Hashtable));
             }
-            return output; //TODO: real implementation!
+            //TODO: remove installed zigs from the list according to some ID parameter
+            return output; 
         }
         
         public InstalledZig InstallZig(string PathToZigFile)
         {
             //TODO: Make sure it's a valid zig file (extract metadata, see that it's okay)
+            //TODO: get directory name from metadata
             //TODO: check for overwrites!
             string OutDir = Path.Combine(RootDir, Path.GetFileName(PathToZigFile));
             CreateDirRecursive(new DirectoryInfo(OutDir));
