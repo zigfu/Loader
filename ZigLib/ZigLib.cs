@@ -40,6 +40,11 @@ namespace ZigLib
 		{
 			//TODO
 		}
+
+        public static string GetRemoteZigQuery(string BaseURL)
+        {
+            return BaseURL + "/everyzig/" + OSFilter.AutodetectOS().OsString;
+        }
 	}
 }
 

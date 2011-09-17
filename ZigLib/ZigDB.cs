@@ -7,6 +7,30 @@ using Ionic.Zip;
 
 namespace ZigLib
 {
+    public class OSFilter
+    {
+        public string OsString { get; private set; }
+
+        private OSFilter(string OsString)
+        {
+            this.OsString = OsString;
+        }
+        public static OSFilter Windows = new OSFilter("win");
+        public static OSFilter Mac = new OSFilter("mac");
+        public static OSFilter All = new OSFilter("all");
+
+        public static OSFilter AutodetectOS()
+        {
+            if (System.Environment.OSVersion.Platform == PlatformID.Win32NT) {
+                return Windows;
+            }
+            else {
+                //TODO: test out other OSes maybe?
+                return Mac;
+            }
+        }
+    }
+
     class ZigDB
     {
         string RootDir;
@@ -39,7 +63,7 @@ namespace ZigLib
         {
             Hashtable ht = (Hashtable)JSON.JsonDecode(zigsJson);
             List<RemoteZig> output = new List<RemoteZig>();
-            foreach (object entry in (ArrayList)ht["zigs"]) {
+            foreach (object entry in (ArrayList)ht["zigEntries"]) {
                 output.Add(new RemoteZig(entry as Hashtable));
             }
             //TODO: remove installed zigs from the list according to some ID parameter

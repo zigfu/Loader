@@ -19,7 +19,7 @@ namespace ZigLib
         public RemoteZig(Hashtable DecodedJSON)
         {
             RemoteURI = (string)DecodedJSON["dl_url"];
-            Metadata = new ZigMetadata(DecodedJSON);
+            Metadata = new ZigMetadata(DecodedJSON["zig"] as Hashtable);
         }
 
         public override string ToString()
