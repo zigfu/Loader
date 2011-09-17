@@ -8,7 +8,7 @@ namespace ZigLib
 	public class ZigLib
 	{
         //TODO: ugh
-        private static ZigDB db = new ZigDB("Zigs");
+        private static ZigDB db = new ZigDB("Zigs", "http://django.zigfu.com/django");
 
 
 		public static IEnumerable<InstalledZig> EnumerateInstalledZigs()
@@ -26,7 +26,7 @@ namespace ZigLib
             return db.InstallZig(localZigPath);
 		}
 
-        public static bool IsZigInstalled(RemoteZig zig)
+        public static bool IsZigInstalled(IZig zig)
         {
             return db.IsInstalled(zig);
         }
@@ -38,13 +38,22 @@ namespace ZigLib
 		
 		public static void RemoveZig(InstalledZig zigToRemove)
 		{
-			//TODO
+            db.RemoveZig(zigToRemove);
 		}
 
-        public static string GetRemoteZigQuery(string BaseURL)
+        public static string GetRemoteZigsQuery()
         {
-            return BaseURL + "/everyzig/" + OSFilter.AutodetectOS().OsString;
+            return db.GetRemoteZigsQuery();
         }
-	}
+
+        public static string GetLocalZigQuery(InstalledZig zig)
+        {
+            return db.GetZigQuery(zig);
+        }
+        public static string GetLocalZigQuery(string zigId)
+        {
+            return db.GetZigQuery(zigId);
+        }
+    }
 }
 

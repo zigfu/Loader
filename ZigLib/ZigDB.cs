@@ -34,12 +34,14 @@ namespace ZigLib
     class ZigDB
     {
         string RootDir;
+        string RootURL;
 
         public Dictionary<string, InstalledZig> Zigs { get; private set; }
 
-        public ZigDB(string ZigDir)
+        public ZigDB(string ZigDir, string APIBaseURL)
         {
             RootDir = ZigDir;
+            RootURL = APIBaseURL;
             // TODO: provide a way to order items
             Zigs = new Dictionary<string, InstalledZig>();
             try {
@@ -70,7 +72,7 @@ namespace ZigLib
             return output; 
         }
 
-        public bool IsInstalled(RemoteZig zig)
+        public bool IsInstalled(IZig zig)
         {
             return Zigs.ContainsKey(zig.Metadata.Name); //TODO: change on adding ID to zigs
         }
@@ -101,6 +103,29 @@ namespace ZigLib
         {
             using (ZipFile z = ZipFile.Read(InPath)) {
                 z.ExtractAll(OutPath, ExtractExistingFileAction.OverwriteSilently); // TODO: handle errors?
+            }
+        }
+
+        public string GetRemoteZigsQuery()
+        {
+            return RootURL + "/everyzig/" + OSFilter.AutodetectOS().OsString;
+        }
+
+        public string GetZigQuery(string ZigID)
+        {
+            return RootURL + "/onezig?zigid=" + ZigID;
+        }
+
+        public string GetZigQuery(InstalledZig Zig)
+        {
+            return GetZigQuery(Zig.Metadata.ID);
+        }
+
+        internal void RemoveZig(InstalledZig zigToRemove)
+        {
+            if (!IsInstalled(zigToRemove)) {
+                //TODO: some error and/or real logging
+                Console.Error.WriteLine("attempted to remove missing zig");
             }
         }
     }
