@@ -7,7 +7,7 @@ using System.Collections;
 using System.Runtime.InteropServices;
 namespace ZigLib
 {
-    public class InstalledZig
+    public class InstalledZig : IZig
     {
         const string MetadataFilename = ".metadata";
         public ZigMetadata Metadata { get; private set; }

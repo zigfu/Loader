@@ -5,7 +5,7 @@ using System.Collections;
 
 namespace ZigLib
 {
-    public class RemoteZig
+    public class RemoteZig : IZig
     {
         public ZigMetadata Metadata { get; private set; }
         public string RemoteURI { get; private set; }
