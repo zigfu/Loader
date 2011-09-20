@@ -17,7 +17,14 @@ namespace Loader
 {
     class FullscreenNotifier : Form
     {
+
+
+        // tray icon
+        NotifyIcon TrayIcon;
+        System.ComponentModel.IContainer container;
+
         private uint CallBackMessage;
+
         public FullscreenNotifier()
         {
             FullscreenAppOpen = false;
@@ -30,6 +37,20 @@ namespace Loader
             Size = new System.Drawing.Size(1, 1); 
 
             this.Load += new EventHandler(FullscreenNotifier_Loaded);
+
+            container = new System.ComponentModel.Container();
+
+            TrayIcon = new NotifyIcon(container);
+            TrayIcon.Visible = true;
+            TrayIcon.Icon = new System.Drawing.Icon("Ninja-Toy.ico");
+            TrayIcon.Text = "ZigFu loader. Having this means you're awesome!";
+            TrayIcon.ContextMenuStrip = new ContextMenuStrip(container) {
+                Items = {
+                    new ToolStripLabel("E&xit", null, false, new EventHandler(delegate(object o, EventArgs e) { TrayIcon.Visible = false;  this.Close(); }))
+                },
+                
+            };
+            // TODO: left click gives context menu too
         }
 
         void FullscreenNotifier_Loaded(object sender, EventArgs e)
@@ -56,7 +77,6 @@ namespace Loader
             if (NativeMethod.SHAppBarMessage(ABMsg.ABM_NEW, ref appBar) == 0) {
                 throw new Exception("SHAppBarMessage failed");
             }
-
         }
 
         public bool FullscreenAppOpen { get; private set; }
@@ -71,7 +91,6 @@ namespace Loader
                         (FullscreenAppOpen ? "opening" : "closing"));
                 }
             }
-
             base.WndProc(ref m);
         }
     }
