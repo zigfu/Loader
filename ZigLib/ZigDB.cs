@@ -76,6 +76,12 @@ namespace ZigLib
         {
             return Zigs.ContainsKey(zig.Metadata.Name); //TODO: change on adding ID to zigs
         }
+
+        public InstalledZig GetLocalZig(RemoteZig remote)
+        {
+            // TODO: error handling?
+            return Zigs[remote.Metadata.Name];
+        }
         
         public InstalledZig InstallZig(string PathToZigFile)
         {

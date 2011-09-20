@@ -31,6 +31,12 @@ namespace ZigLib
             return db.IsInstalled(zig);
         }
 
+        // only call if you know that the remote zig is in fact installed (e.g. using IsZigInstalled())
+        public static InstalledZig GetInstalledZig(RemoteZig zig)
+        {
+            return db.GetLocalZig(zig);
+        }
+
 		public static void LaunchZig(InstalledZig zigToLaunch)
 		{
             zigToLaunch.Launch();
