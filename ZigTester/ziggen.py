@@ -15,8 +15,8 @@ zig_properties = [('command', str),
                           ("description", str, "Just another Lorem Ipsum placeholder"),
                           ("developer", str, "Scopeware"),
                           ("version", float, 0.0),
-                          ("entryid", float, 0.0),
-                          ("zigid", float, 0.0),
+                          ("entryid", str, ""),
+                          ("zigid", str, ""),
                           ]
 
 def json_from_python(some_dict):
