@@ -56,7 +56,7 @@ namespace ZigLib
         {
             return db.GetZigQuery(zig);
         }
-        public static string GetLocalZigQuery(double zigId)
+        public static string GetLocalZigQuery(string zigId)
         {
             return db.GetZigQuery(zigId);
         }

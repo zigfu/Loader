@@ -18,13 +18,12 @@ namespace ZigLib
 
 
         const string MetadataFilename = ".metadata";
-        const string COMMAND = "command";
 
         public InstalledZig(string InstallPath)
         {
             Hashtable props = (Hashtable)JSON.JsonDecode(File.ReadAllText(Path.Combine(InstallPath, MetadataFilename)));
             Metadata = new SharedMetadata(props);
-            this.RunCommand = (string)props[COMMAND]; //relative to Install path
+            this.RunCommand = (string)props[ZigProperties.COMMAND]; //relative to Install path
             this.InstallPath = InstallPath;
 
             // turn thumbnail path from relative path to file:// URI)

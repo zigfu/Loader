@@ -15,6 +15,7 @@ namespace ZigLib
         public const string DOWNLOAD_URL = "dl_url";
         public const string RATING = "rating";
         public const string THUMBNAIL_PATH = "thumbnail_path";
+        public const string COMMAND = "command";
     }
 
     public class SharedMetadata
@@ -22,8 +23,8 @@ namespace ZigLib
         public string Name { get; private set; }
         public string Developer { get; private set; }
         public string Description { get; private set; }
-        public double ZigID { get; private set; }
-        public double EntryID { get; private set; }
+        public string ZigID { get; private set; }
+        public string EntryID { get; private set; }
         public double Version { get; private set; }
 
         public static SharedMetadata FromFile(string path)
@@ -35,8 +36,8 @@ namespace ZigLib
         {
             Name = (string)properties[ZigProperties.NAME];
             Description = (string)properties[ZigProperties.DESCRIPTION];
-            ZigID = (double)properties[ZigProperties.ZIG_ID];
-            EntryID = (double)properties[ZigProperties.ENTRY_ID];
+            ZigID = (string)properties[ZigProperties.ZIG_ID];
+            EntryID = (string)properties[ZigProperties.ENTRY_ID];
             Version = (double)properties[ZigProperties.VERSION];
             Developer = (string)properties[ZigProperties.DEVELOPER];
         }

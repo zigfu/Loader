@@ -37,14 +37,14 @@ namespace ZigLib
         string RootURL;
 
         public Dictionary<string, InstalledZig> zigsByName;
-        public Dictionary<double, InstalledZig> zigsByID;
+        public Dictionary<string, InstalledZig> zigsByID;
 
         public ZigDB(string ZigDir, string APIBaseURL)
         {
             RootDir = ZigDir;
             RootURL = APIBaseURL;
             // TODO: provide a way to order items
-            zigsByID = new Dictionary<double, InstalledZig>();
+            zigsByID = new Dictionary<string, InstalledZig>();
             zigsByName = new Dictionary<string, InstalledZig>();
             try {
                 foreach (string dir in Directory.GetDirectories(ZigDir)) {
@@ -68,7 +68,7 @@ namespace ZigLib
 
         private static bool HasValidID(IZig iz)
         {
-            return (0.0 != iz.Metadata.ZigID);
+            return (null != iz.Metadata.ZigID) && ("" != iz.Metadata.ZigID);
         }
 
         public IEnumerable<InstalledZig> EnumerateInstalledZigs()
@@ -138,7 +138,7 @@ namespace ZigLib
             return RootURL + "/everyzig/" + OSFilter.AutodetectOS().OsString;
         }
 
-        public string GetZigQuery(double ZigID)
+        public string GetZigQuery(string ZigID)
         {
             return RootURL + "/onezig?zigid=" + ZigID;
         }
