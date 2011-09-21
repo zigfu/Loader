@@ -37,14 +37,14 @@ namespace ZigLib
         string RootURL;
 
         public Dictionary<string, InstalledZig> zigsByName;
-        public Dictionary<string, InstalledZig> zigsByID;
+        public Dictionary<double, InstalledZig> zigsByID;
 
         public ZigDB(string ZigDir, string APIBaseURL)
         {
             RootDir = ZigDir;
             RootURL = APIBaseURL;
             // TODO: provide a way to order items
-            zigsByID = new Dictionary<string, InstalledZig>();
+            zigsByID = new Dictionary<double, InstalledZig>();
             zigsByName = new Dictionary<string, InstalledZig>();
             try {
                 foreach (string dir in Directory.GetDirectories(ZigDir)) {
@@ -62,13 +62,13 @@ namespace ZigLib
         {
             zigsByName[iz.Metadata.Name] = iz;
             if (HasValidID(iz)) {
-                zigsByID[iz.Metadata.ID] = iz;
+                zigsByID[iz.Metadata.ZigID] = iz;
             }
         }
 
         private static bool HasValidID(IZig iz)
         {
-            return (null != iz.Metadata.ID) && ("" != iz.Metadata.ID);
+            return (0.0 != iz.Metadata.ZigID);
         }
 
         public IEnumerable<InstalledZig> EnumerateInstalledZigs()
@@ -92,7 +92,7 @@ namespace ZigLib
             if (zigsByName.ContainsKey(zig.Metadata.Name)) {
                 return true;
             }
-            if (HasValidID(zig) && (zigsByID.ContainsKey(zig.Metadata.ID))) {
+            if (HasValidID(zig) && (zigsByID.ContainsKey(zig.Metadata.ZigID))) {
                 return true;
             }
             return false;
@@ -101,7 +101,7 @@ namespace ZigLib
         public InstalledZig GetLocalZig(RemoteZig remote)
         {
             // TODO: error handling?
-            return zigsByID[remote.Metadata.ID];
+            return zigsByID[remote.Metadata.ZigID];
         }
         
         public InstalledZig InstallZig(string PathToZigFile)
@@ -138,14 +138,14 @@ namespace ZigLib
             return RootURL + "/everyzig/" + OSFilter.AutodetectOS().OsString;
         }
 
-        public string GetZigQuery(string ZigID)
+        public string GetZigQuery(double ZigID)
         {
             return RootURL + "/onezig?zigid=" + ZigID;
         }
 
         public string GetZigQuery(InstalledZig Zig)
         {
-            return GetZigQuery(Zig.Metadata.ID);
+            return GetZigQuery(Zig.Metadata.ZigID);
         }
 
         internal void RemoveZig(InstalledZig zigToRemove)
@@ -154,6 +154,7 @@ namespace ZigLib
                 //TODO: some error and/or real logging
                 Console.Error.WriteLine("attempted to remove missing zig");
             }
+            //TODO: real code
         }
     }
 }

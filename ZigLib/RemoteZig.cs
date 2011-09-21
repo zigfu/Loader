@@ -7,19 +7,18 @@ namespace ZigLib
 {
     public class RemoteZig : IZig
     {
-        public ZigMetadata Metadata { get; private set; }
-        public string RemoteURI { get; private set; }
+        
 
-        public RemoteZig(string RemoteURI, ZigMetadata Metadata)
-        {
-            this.RemoteURI = RemoteURI;
-            this.Metadata = Metadata;
-        }
+        public string RemoteURI { get; private set; }
+        public double Rating { get; private set; }
+        public string ThumbnailURI { get; private set; }
+        public SharedMetadata Metadata { get; private set; }
 
         public RemoteZig(Hashtable DecodedJSON)
         {
-            RemoteURI = (string)DecodedJSON["dl_url"];
-            Metadata = new ZigMetadata(DecodedJSON["zig"] as Hashtable);
+            Metadata = new SharedMetadata(DecodedJSON);
+            RemoteURI = (string)DecodedJSON[ZigProperties.DOWNLOAD_URL];
+            ThumbnailURI = (string)DecodedJSON[ZigProperties.THUMBNAIL_URL];
         }
 
         public override string ToString()

@@ -58,7 +58,7 @@ namespace ZigTester
                     }
                     else {
                         Console.WriteLine("Checking if zigid {0} is in the remote db", args[1]);
-                        string query = ZigLib.ZigLib.GetLocalZigQuery(args[1]);
+                        string query = ZigLib.ZigLib.GetLocalZigQuery(double.Parse(args[1]));
                         Console.WriteLine("Query: " + query);
                         WebRequest wr3 = WebRequest.Create(query);
                         Console.WriteLine("Response: " + new StreamReader(wr3.GetResponse().GetResponseStream()).ReadToEnd());

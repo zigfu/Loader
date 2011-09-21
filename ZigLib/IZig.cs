@@ -6,6 +6,6 @@ namespace ZigLib
 {
     public interface IZig
     {
-        ZigMetadata Metadata { get; }
+        SharedMetadata Metadata { get; }
     }
 }

@@ -9,22 +9,28 @@ namespace ZigLib
 {
     public class InstalledZig : IZig
     {
-        const string MetadataFilename = ".metadata";
-        public ZigMetadata Metadata { get; private set; }
 
         public string InstallPath { get; private set; }
         public string RunCommand {get; private set; }
+        public SharedMetadata Metadata { get; private set; }
+        public string ThumbnailURI { get; private set; }
         //TODO: cmdline-arguments
 
+
+        const string MetadataFilename = ".metadata";
         const string COMMAND = "command";
 
         public InstalledZig(string InstallPath)
         {
             Hashtable props = (Hashtable)JSON.JsonDecode(File.ReadAllText(Path.Combine(InstallPath, MetadataFilename)));
-            //TODO: make sure the thumbnail points to disk instead of web URL
-            this.Metadata = new ZigMetadata(props);
-            this.RunCommand = (string)props[COMMAND];
+            Metadata = new SharedMetadata(props);
+            this.RunCommand = (string)props[COMMAND]; //relative to Install path
             this.InstallPath = InstallPath;
+
+            // turn thumbnail path from relative path to file:// URI)
+            string fulldir = Path.GetFullPath(InstallPath);
+            string AbsoluteIconPath = Path.Combine(fulldir, (string)props[ZigProperties.THUMBNAIL_PATH]);
+            ThumbnailURI = "file://" + AbsoluteIconPath.Replace('\\', '/');
         }
 
         //TODO: really, really ugh
