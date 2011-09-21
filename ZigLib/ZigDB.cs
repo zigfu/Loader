@@ -36,18 +36,20 @@ namespace ZigLib
         string RootDir;
         string RootURL;
 
-        public Dictionary<string, InstalledZig> Zigs { get; private set; }
+        public Dictionary<string, InstalledZig> zigsByName;
+        public Dictionary<string, InstalledZig> zigsByID;
 
         public ZigDB(string ZigDir, string APIBaseURL)
         {
             RootDir = ZigDir;
             RootURL = APIBaseURL;
             // TODO: provide a way to order items
-            Zigs = new Dictionary<string, InstalledZig>();
+            zigsByID = new Dictionary<string, InstalledZig>();
+            zigsByName = new Dictionary<string, InstalledZig>();
             try {
                 foreach (string dir in Directory.GetDirectories(ZigDir)) {
                     InstalledZig iz = new InstalledZig(dir);
-                    Zigs[iz.Metadata.Name] = iz; //TODO: use metadata ID or something like that
+                    AddInstalledZig(iz); //TODO: use metadata ID or something like that
                 }
             }
             catch (DirectoryNotFoundException) {
@@ -56,9 +58,22 @@ namespace ZigLib
             }
         }
 
+        private void AddInstalledZig(InstalledZig iz)
+        {
+            zigsByName[iz.Metadata.Name] = iz;
+            if (HasValidID(iz)) {
+                zigsByID[iz.Metadata.ID] = iz;
+            }
+        }
+
+        private static bool HasValidID(IZig iz)
+        {
+            return (null != iz.Metadata.ID) && ("" != iz.Metadata.ID);
+        }
+
         public IEnumerable<InstalledZig> EnumerateInstalledZigs()
         {
-            return Zigs.Values;
+            return zigsByName.Values;
         }
 
         public IEnumerable<RemoteZig> EnumerateRemoteZigs(string zigsJson)
@@ -74,13 +89,19 @@ namespace ZigLib
 
         public bool IsInstalled(IZig zig)
         {
-            return Zigs.ContainsKey(zig.Metadata.Name); //TODO: change on adding ID to zigs
+            if (zigsByName.ContainsKey(zig.Metadata.Name)) {
+                return true;
+            }
+            if (HasValidID(zig) && (zigsByID.ContainsKey(zig.Metadata.ID))) {
+                return true;
+            }
+            return false;
         }
 
         public InstalledZig GetLocalZig(RemoteZig remote)
         {
             // TODO: error handling?
-            return Zigs[remote.Metadata.Name];
+            return zigsByID[remote.Metadata.ID];
         }
         
         public InstalledZig InstallZig(string PathToZigFile)
@@ -92,7 +113,7 @@ namespace ZigLib
             CreateDirRecursive(new DirectoryInfo(OutDir));
             ExtractZip(PathToZigFile, OutDir);
             InstalledZig iz = new InstalledZig(OutDir);
-            Zigs[iz.Metadata.Name] = iz;
+            AddInstalledZig(iz);
             return iz;
         }
 
