@@ -9,13 +9,13 @@ METADATA_CONFIG_FILE = "config.py"
 METADATA_BASE = { "zig" :
                   { "description" : "Just another Lorem Ipsum placeholder",
                     "name" : "test random number: %d" % random.randint(1,9999),
-                    "thumbnail" : ""
+                    "thumbnail_url" : ""
                   },
                   "version" : 0.0,
                 }
 
 
-allowed_zig_properties = ["name", "thumbnail", "description"]
+allowed_zig_properties = ["name", "thumbnail_url", "description"]
 COMMAND = 'command'
 
 def json_from_python(some_dict):
@@ -41,8 +41,8 @@ def create_metadata(config_locals):
     metadata[COMMAND] = config_locals[COMMAND]
     for property in allowed_zig_properties:
         if property in config_locals:
-            print 'found %s property, placing in zig' % property
-            metadata[property] = config_locals[property]
+            print 'found %s property, placing in zig: %s' % (property, config_locals[property])
+            metadata["zig"][property] = config_locals[property]
 
     return json_from_python(metadata)
     
@@ -52,6 +52,8 @@ def create_zigfile(base_path, out_path):
     print "The list of filtered files is:"
     for filtered in filterlist:
         print filtered
+    # implicitly add existing metadata to filter list
+    filterlist += [".metadata"]
     with zipfile.ZipFile(out_path,"w", zipfile.ZIP_DEFLATED) as out_zig:
 ##        if not path.exists(path.join(base_path, METADATA_FILE)):
 ##            print "no metadata file, trying to use %s to generate metadata" % METADATA_CONFIG_FILE
