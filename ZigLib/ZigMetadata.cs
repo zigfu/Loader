@@ -27,11 +27,6 @@ namespace ZigLib
         public string EntryID { get; private set; }
         public double Version { get; private set; }
 
-        public static SharedMetadata FromFile(string path)
-        {
-            return new SharedMetadata(JSON.JsonDecode(File.ReadAllText(path)) as Hashtable);
-        }
-
         public SharedMetadata(Hashtable properties)
         {
             Name = (string)properties[ZigProperties.NAME];
