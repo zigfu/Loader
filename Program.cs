@@ -119,8 +119,28 @@ namespace Loader
             if (args.Length > 0) {
                 string RootProgram = args[0];
                 if (RootProgram == "client") {
-                    Console.WriteLine("Client! Invoking!");
+                    Console.WriteLine("Client mode!");
+                    bool launched = false;
+                    if (!LoaderLib.LoaderAPI.ServerExists()) {
+                        Console.WriteLine("No server found, launching server!");
+                        LoaderLib.LoaderAPI.LaunchServer();
+                        Console.Write("waiting for server to come online");
+                        while (!LoaderLib.LoaderAPI.ServerExists()) {
+                            System.Threading.Thread.Sleep(500);
+                            Console.Write(".");
+                        }
+                        Console.WriteLine();
+                        Console.WriteLine("Server up and running!");
+                        launched = true;
+                    }
+                    else {
+                        Console.WriteLine("Existing server detected, using it");
+                    }
                     LoaderLib.LoaderAPI.ConnectToServer().LaunchProcess(@"c:\windows\system32\notepad.exe", "shit");
+                    if (launched) {
+                        Console.WriteLine("We launched the server, so we're going to kill it!");
+                        LoaderLib.LoaderAPI.ShutdownClient();
+                    }
                     return;
                 }
                 Console.WriteLine("Server! Use Ctrl-C to exit!");
@@ -155,7 +175,12 @@ namespace Loader
                 });
                 Console.WriteLine("done with callback");
 
-            });
+            },
+                // quit delegate
+            delegate(object s, EventArgs e) {
+                f.Close();
+            }
+            );
 
             f.HandleCreated += delegate(object s, EventArgs e) { SharedObject.ServerWindowHandle = f.Handle; };
 
