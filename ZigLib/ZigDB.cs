@@ -101,7 +101,17 @@ namespace ZigLib
         public InstalledZig GetLocalZig(RemoteZig remote)
         {
             // TODO: error handling?
-            return zigsByID[remote.Metadata.ZigID];
+            try {
+                return zigsByID[remote.Metadata.ZigID];
+            }
+            catch (KeyNotFoundException) {
+                try {
+                    return zigsByName[remote.Metadata.Name];
+                }
+                catch (KeyNotFoundException) {
+                    return null;
+                }
+            }
         }
         
         public InstalledZig InstallZig(string PathToZigFile)
