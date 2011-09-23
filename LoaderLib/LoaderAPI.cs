@@ -71,8 +71,11 @@ namespace LoaderLib
 			props["name"] = System.Guid.NewGuid().ToString();
 			props["typeFilterLevel"] = System.Runtime.Serialization.Formatters.TypeFilterLevel.Full;
 				
-			IpcChannel chan = 
-				new IpcChannel(props, clientProvider, serverProvider);
+			IpcClientChannel chan = 
+				//new IpcChannel(props, clientProvider, serverProvider);
+                new IpcClientChannel(props, clientProvider);
+
+            //IpcClientChannel chan2 = new IpcClientChannel(
 
    			ChannelServices.RegisterChannel(chan, false);
 
@@ -132,8 +135,10 @@ namespace LoaderLib
             props["portName"] = "LoaderProcess";
 			props["typeFilterLevel"] = System.Runtime.Serialization.Formatters.TypeFilterLevel.Full;
 				
-			IpcChannel chan = 
-				new IpcChannel(props, clientProvider, serverProvider);
+            //IpcChannel chan = 
+            //    new IpcChannel(props, clientProvider, serverProvider);
+            IpcServerChannel chan =
+                new IpcServerChannel(props, serverProvider);
 
 			ChannelServices.RegisterChannel(chan, false);
 	
