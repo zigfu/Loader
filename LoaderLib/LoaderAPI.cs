@@ -5,7 +5,7 @@ using System.Text;
 using System.Diagnostics;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
-//using System.Runtime.Remoting.Channels.Tcp;
+using System.Runtime.Remoting.Channels.Tcp;
 using System.Runtime.Remoting.Channels.Ipc;
 using System.Runtime.Remoting.Services;
 using System.Collections;
@@ -55,32 +55,45 @@ namespace LoaderLib
             if (!ServerExists()) {
                 return null;
             }
-   			//string url = string.Format(@"tcp://LocalHost:{0}/LoaderAPI", port);
-            string url = string.Format(@"ipc://LoaderProcess/LoaderAPI", port);
+            string url = GetUrlString();
+            //string url = string.Format(@"ipc://LoaderProcess/LoaderAPI", port);
 			BinaryClientFormatterSinkProvider clientProvider = 
 				new BinaryClientFormatterSinkProvider();
 
 			BinaryServerFormatterSinkProvider serverProvider =
 				new BinaryServerFormatterSinkProvider();
-				
-			serverProvider.TypeFilterLevel = 
-				System.Runtime.Serialization.Formatters.TypeFilterLevel.Full;
+
+            serverProvider.TypeFilterLevel =
+                System.Runtime.Serialization.Formatters.TypeFilterLevel.Full;
 
 			IDictionary props = new Hashtable();
-			props["port"] = 0;
+			props["port"] = port;
+            props["portName"] = "LoaderProcess";
 			props["name"] = System.Guid.NewGuid().ToString();
-			props["typeFilterLevel"] = System.Runtime.Serialization.Formatters.TypeFilterLevel.Full;
+            props["bindTo"] = "127.0.0.1";
+            props["rejectRemoteRequests"] = true;
+            props["typeFilterLevel"] = System.Runtime.Serialization.Formatters.TypeFilterLevel.Full;
 				
-			IpcClientChannel chan = 
-				//new IpcChannel(props, clientProvider, serverProvider);
-                new IpcClientChannel(props, clientProvider);
+            //IpcClientChannel chan = 
+            //    //new IpcChannel(props, clientProvider, serverProvider);
+            //    new IpcClientChannel(props, clientProvider);
+            TcpClientChannel chan =
+                //new IpcChannel(props, clientProvider, serverProvider);
+                new TcpClientChannel(props, clientProvider);
 
-            //IpcClientChannel chan2 = new IpcClientChannel(
 
    			ChannelServices.RegisterChannel(chan, false);
 
             MarshalByRefObject obj = (MarshalByRefObject)RemotingServices.Connect(typeof(LoaderAPI), url);
             return obj as LoaderAPI;
+        }
+
+        private static string GetUrlString()
+        {
+            //TCP
+            return string.Format(@"tcp://LocalHost:{0}/LoaderAPI", port);
+            //IPC
+            //return string.Format(@"ipc://LoaderProcess/LoaderAPI", port)
         }
 
         public static bool ServerExists()
@@ -123,22 +136,27 @@ namespace LoaderLib
 			BinaryServerFormatterSinkProvider serverProvider =
 				new BinaryServerFormatterSinkProvider();
 
-			serverProvider.TypeFilterLevel = 
-				System.Runtime.Serialization.Formatters.TypeFilterLevel.Full;
+            serverProvider.TypeFilterLevel =
+                System.Runtime.Serialization.Formatters.TypeFilterLevel.Full;
 
 			IDictionary props = new Hashtable();
 
 			/*
 				* Client and server must use the SAME port
 				* */
-			//props["port"] = port;
+            props["port"] = port;
             props["portName"] = "LoaderProcess";
-			props["typeFilterLevel"] = System.Runtime.Serialization.Formatters.TypeFilterLevel.Full;
-				
+            props["name"] = System.Guid.NewGuid().ToString();
+            props["typeFilterLevel"] = System.Runtime.Serialization.Formatters.TypeFilterLevel.Full;
+            props["bindTo"] = "127.0.0.1";
+            props["rejectRemoteRequests"] = true;
+
             //IpcChannel chan = 
             //    new IpcChannel(props, clientProvider, serverProvider);
-            IpcServerChannel chan =
-                new IpcServerChannel(props, serverProvider);
+            //IpcServerChannel chan =
+            //    new IpcServerChannel(props, serverProvider);
+            TcpServerChannel chan =
+                new TcpServerChannel(props, serverProvider);
 
 			ChannelServices.RegisterChannel(chan, false);
 	
