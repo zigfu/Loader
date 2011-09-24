@@ -7,16 +7,28 @@ from os import path
 METADATA_FILE = ".metadata"
 
 COMMAND = 'command'
+METADATA_VERSION = "1"
+
+def autodetect_os():
+    if os.name == "nt":
+        return "Win"
+    elif os.name == "posix":
+        # assume mac because we don't support linux
+        return "Mac"
+    else:
+        raise Exception("Unhandled OS")
 
 # list of (property-name, conversion function, default value)
 zig_properties = [('command', str),
                           ("thumbnail_path", str),
                           ("name", str, "test random number: %d" % random.randint(1,9999)),
                           ("description", str, "Just another Lorem Ipsum placeholder"),
+                          ("os", str, autodetect_os()),
                           ("developer", str, "Scopeware"),
                           ("version", float, 0.0),
                           ("entryid", str, ""),
                           ("zigid", str, ""),
+                          ("metadata_version", str, METADATA_VERSION),
                           ]
 
 def json_from_python(some_dict):
@@ -26,6 +38,7 @@ def json_from_python(some_dict):
 
 
 def create_metadata(*params):
+    
     metadata = dict( (i[0], i[1](value) if value else i[2]) for i, value in map(None, zig_properties, params))
     return json_from_python(metadata)
     
