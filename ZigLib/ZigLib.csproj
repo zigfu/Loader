@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -64,6 +64,7 @@
     <Compile Include="IZig.cs" />
     <Compile Include="JSON.cs" />
     <Compile Include="RemoteZig.cs" />
+    <Compile Include="Utility.cs" />
     <Compile Include="ZigDB.cs" />
     <Compile Include="ZigLib.cs" />
     <Compile Include="ZigMetadata.cs" />

@@ -1,16 +1,37 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
-
+using System.IO;
 namespace ZigLib
 {
 
 	public class ZigLib
 	{
-        //TODO: ugh
-        private static ZigDB db = new ZigDB("Zigs", "http://django.zigfu.com/django");
+        public const string ZigDBDefaultDirName = "Zigs";
+        public const string ZigDefaultBaseURL = "http://django.zigfu.com/django";
+        public static string GetDefaultZDBPath() {
+            DirectoryInfo di = new DirectoryInfo(Utility.GetMainModuleDirectory());
+            return Path.Combine(di.Parent.FullName, ZigDBDefaultDirName);
+        }
 
 
+        //TODO: something thread-safe?
+        private static ZigDB _db;
+        private static ZigDB db {
+            get {
+                if (_db == null) {
+                    _db = new ZigDB(GetDefaultZDBPath(), ZigDefaultBaseURL);
+                }
+                return _db;
+            }
+        }
+
+        public static void Init(string DBPath, string BaseURL)
+        {
+            if (null != _db) {
+                throw new Exception("Double-init! :(");
+            }
+            _db = new ZigDB(DBPath, BaseURL);
+        }
 		public static IEnumerable<InstalledZig> EnumerateInstalledZigs()
 		{
 			return db.EnumerateInstalledZigs();
