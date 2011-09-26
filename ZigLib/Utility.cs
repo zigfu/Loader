@@ -14,20 +14,26 @@ namespace ZigLib
             return (new FileInfo(MainModulePath)).DirectoryName;
         }
 
-        // depth-first recursive move directory 
+        // depth-first recursive move directory
+        //TODO: make non-shitty version! (e.g. no silent ignore of errors, etc.)
         public static void MoveDirWithLockedFile(string OldDir, string NewDir)
         {
             if (!Directory.Exists(NewDir)) {
                 Directory.CreateDirectory(NewDir);
             }
             DirectoryInfo di = new DirectoryInfo(OldDir);
-            // call recursiively on subdirs
+            // call recursively on subdirs
             foreach (var subdir in di.GetDirectories()) {
                 MoveDirWithLockedFile(Path.Combine(OldDir, subdir.Name), Path.Combine(NewDir, subdir.Name));
             }
 
             foreach (var file in di.GetFiles()) {
-                file.MoveTo(Path.Combine(NewDir, file.Name));
+                try {
+                    file.MoveTo(Path.Combine(NewDir, file.Name));
+                }
+                catch (IOException) {
+                    //TODO: real error handling
+                }
             }
 
 
