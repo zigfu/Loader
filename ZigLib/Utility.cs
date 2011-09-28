@@ -10,8 +10,13 @@ namespace ZigLib
     {
 
         public static string GetMainModuleDirectory() {
-            string MainModulePath = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
-            return (new FileInfo(MainModulePath)).DirectoryName;
+            // TODO: causes strange unity crash on second "play" click
+            //string MainModulePath = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
+
+            //return (new FileInfo(MainModulePath)).DirectoryName;
+
+            // doesn't crash but not exactly what we want
+            return Directory.GetCurrentDirectory(); 
         }
 
         // depth-first recursive move directory
