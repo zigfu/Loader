@@ -136,7 +136,7 @@ namespace Loader
                     else {
                         Console.WriteLine("Existing server detected, using it");
                     }
-                    LoaderLib.LoaderAPI.ConnectToServer().LaunchProcess(@"c:\windows\system32\notepad.exe", "shit");
+                    LoaderLib.LoaderAPI.ConnectToServer().LaunchProcess(@"c:\windows\system32\notepad.exe", "shit", System.Diagnostics.Process.GetCurrentProcess().Id);
                     if (launched) {
                         Console.WriteLine("We launched the server, so we're going to kill it!");
                         LoaderLib.LoaderAPI.ShutdownClient();
@@ -157,8 +157,9 @@ namespace Loader
 
             var SharedObject = LoaderLib.LoaderAPI.StartServer(f.Handle, delegate(object sender, LoaderLib.CreateProcessEventArgs e) {
                 Console.WriteLine("CreateProcess: {0}, in dir: {1}", e.Command, e.Path);
-                if (proc != null) {
-                    ShowWindow(proc.MainWindowHandle, 11); // magic number = SW_FORCEMINIMIZE
+                var launchingProcess = System.Diagnostics.Process.GetProcessById(e.ProcessID);
+                if (launchingProcess != null) {
+                    ShowWindow(launchingProcess.MainWindowHandle, 11); // magic number = SW_FORCEMINIMIZE
                 }
 
                 //TODO: ugh (change to event instead of polling)
@@ -169,8 +170,8 @@ namespace Loader
                 var newProc = System.Diagnostics.Process.Start(e.Command);
                 newProc.EnableRaisingEvents = true;
                 newProc.Exited += new EventHandler(delegate(object sender2, EventArgs e2) {
-                    if (proc != null) {
-                        ShowWindow(proc.MainWindowHandle, 9); // magic number = SW_SHOW
+                    if (launchingProcess != null) {
+                        ShowWindow(launchingProcess.MainWindowHandle, 9); // magic number = SW_SHOW
                     }
                 });
                 Console.WriteLine("done with callback");

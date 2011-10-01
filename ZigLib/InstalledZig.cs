@@ -43,7 +43,7 @@ namespace ZigLib
             SetForegroundWindow(RemoteAPI.ServerWindowHandle);
             string workingDir = Path.GetFullPath(InstallPath);
             //TODO: make RunCommand stay relative (some minor changes to LoaderAPI required)
-            RemoteAPI.LaunchProcess(Path.Combine(workingDir, RunCommand), workingDir);
+            RemoteAPI.LaunchProcess(Path.Combine(workingDir, RunCommand), workingDir, System.Diagnostics.Process.GetCurrentProcess().Id);
         }
 
         public override string ToString()

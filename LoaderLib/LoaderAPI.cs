@@ -17,6 +17,7 @@ namespace LoaderLib
     public class CreateProcessEventArgs : EventArgs {
         public string Command;
         public string Path;
+        public int ProcessID;
     }
     
     // NOTE: I'm doing some very fishy things with named events here
@@ -42,10 +43,10 @@ namespace LoaderLib
             ServerEvent.Set();
         }
 
-        public void LaunchProcess(string command, string path)
+        public void LaunchProcess(string command, string path, int pid)
         {
             //Console.WriteLine("SERVER: cmd: {0}, wd: {1}", command, path);
-            ServerCB(this, new CreateProcessEventArgs() { Path = path, Command = command });
+            ServerCB(this, new CreateProcessEventArgs() { Path = path, Command = command, ProcessID = pid });
         }
 
         public IntPtr ServerWindowHandle;
