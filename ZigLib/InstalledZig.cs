@@ -40,6 +40,9 @@ namespace ZigLib
         public void Launch()
         {
             var RemoteAPI = LoaderLib.LoaderAPI.ConnectToServer();
+            if (null == RemoteAPI) {
+                return; //TODO: launch loader.exe or return some error instead of silent fail
+            }
             SetForegroundWindow(RemoteAPI.ServerWindowHandle);
             string workingDir = Path.GetFullPath(InstallPath);
             //TODO: make RunCommand stay relative (some minor changes to LoaderAPI required)

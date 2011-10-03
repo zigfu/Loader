@@ -48,8 +48,13 @@ namespace ZigLib
             zigsByName = new Dictionary<string, InstalledZig>();
             try {
                 foreach (string dir in Directory.GetDirectories(ZigDir)) {
-                    InstalledZig iz = new InstalledZig(dir);
-                    AddInstalledZig(iz); //TODO: use metadata ID or something like that
+                    try {
+                        InstalledZig iz = new InstalledZig(dir);
+                        AddInstalledZig(iz); //TODO: use metadata ID or something like that
+                    }
+                    catch (IOException) {
+                        // TODO: log the failure somehow - failed to read the metadata for some reason
+                    }
                 }
             }
             catch (DirectoryNotFoundException) {
