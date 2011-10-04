@@ -154,6 +154,8 @@ namespace Loader
 
             FullscreenNotifier f = new FullscreenNotifier();
             f.Show();
+            OpenNIListener gestureShit = new OpenNIListener();
+            gestureShit.Start();
 
             var SharedObject = LoaderLib.LoaderAPI.StartServer(f.Handle, delegate(object sender, LoaderLib.CreateProcessEventArgs e) {
                 Console.WriteLine("CreateProcess: {0}, in dir: {1}", e.Command, e.Path);
@@ -166,16 +168,29 @@ namespace Loader
                 while (f.FullscreenAppOpen) {
                     System.Threading.Thread.Sleep(100);
                 }
-
                 var newProc = System.Diagnostics.Process.Start(e.Command);
-                newProc.EnableRaisingEvents = true;
-                newProc.Exited += new EventHandler(delegate(object sender2, EventArgs e2) {
-                    if (launchingProcess != null) {
-                        ShowWindow(launchingProcess.MainWindowHandle, 9); // magic number = SW_SHOW
+                EventHandler<OpenNI.GestureRecognizedEventArgs> callback = delegate(object s2, OpenNI.GestureRecognizedEventArgs ev) {
+                    Console.WriteLine("detected wave");
+                    if ((null != newProc) && (newProc.HasExited == false)) {
+                        newProc.Kill();
                     }
-                });
-                Console.WriteLine("done with callback");
-
+                };
+                gestureShit.Gesture.GestureRecognized += callback;
+                try {
+                    newProc.EnableRaisingEvents = true;
+                    newProc.Exited += new EventHandler(delegate(object sender2, EventArgs e2) {
+                        if (launchingProcess != null) {
+                            ShowWindow(launchingProcess.MainWindowHandle, 9); // magic number = SW_SHOW
+                        }
+                        Console.WriteLine("removing gesture callback - happy flow");
+                        gestureShit.Gesture.GestureRecognized -= callback;
+                    });
+                    Console.WriteLine("done with callback");
+                }
+                catch (Exception) {
+                    // make sure callback is removed
+                    gestureShit.Gesture.GestureRecognized -= callback;
+                }
             },
                 // quit delegate
             delegate(object s, EventArgs e) {
