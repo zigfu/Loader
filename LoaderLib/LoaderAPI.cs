@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Diagnostics;
+using System.IO;
+//using System.Diagnostics;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
@@ -10,7 +11,7 @@ using System.Runtime.Remoting.Channels.Ipc;
 using System.Runtime.Remoting.Services;
 using System.Collections;
 using System.Threading;
-
+using System.Runtime.InteropServices;
 
 namespace LoaderLib
 {
@@ -113,7 +114,35 @@ namespace LoaderLib
 
         public static void LaunchServer()
         {
-            Process.Start("Loader.exe");
+            //ProcessStartInfo psi = new ProcessStartInfo("Loader.exe");
+            //psi.UseShellExecute = false;
+            //psi.WindowStyle = ProcessWindowStyle.Hidden;
+            //Process.Start(psi);
+
+            //TAKE 2
+            //const uint NORMAL_PRIORITY_CLASS = 0x0020;
+
+            //bool retValue;
+            //string Application = @"Loader.exe";
+            //string CommandLine = "";
+            //PROCESS_INFORMATION pInfo = new PROCESS_INFORMATION();
+            //STARTUPINFO sInfo = new STARTUPINFO();
+            //sInfo.cb = Marshal.SizeOf(sInfo);
+            //sInfo.cbReserved2 = 0;
+            //sInfo.lpReserved = null;
+            //sInfo.dwFlags = 1; // STARTF_USESHOWWINDOW
+            //sInfo.wShowWindow = 8; //SW_SHOWNA
+            ////Open Notepad
+            //retValue = CreateProcess(Application, CommandLine,
+            //IntPtr.Zero, IntPtr.Zero, false, NORMAL_PRIORITY_CLASS,
+            //IntPtr.Zero, @"d:\work\git\portal", ref sInfo, out pInfo);
+
+            //Console.WriteLine("Process ID (PID): " + pInfo.dwProcessId);
+            //Console.WriteLine("Process Handle : " + pInfo.hProcess); 
+
+            //TAKE 3
+            ShellExecute(IntPtr.Zero, "open", "Loader.exe", "", null, ShowCommands.SW_SHOWNA);
+            //ShellExecute(IntPtr.Zero, "open", @"D:\work\windowfocustester\bin\Debug\windowfocustester.exe", "", null, ShowCommands.SW_SHOWNA);
         }
 
         public void KillServer()
@@ -182,6 +211,76 @@ namespace LoaderLib
             return null;
         }
 
+        #region PInvoke
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct PROCESS_INFORMATION
+        {
+            public IntPtr hProcess;
+            public IntPtr hThread;
+            public int dwProcessId;
+            public int dwThreadId;
+        }
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        struct STARTUPINFO
+        {
+            public Int32 cb;
+            public string lpReserved;
+            public string lpDesktop;
+            public string lpTitle;
+            public Int32 dwX;
+            public Int32 dwY;
+            public Int32 dwXSize;
+            public Int32 dwYSize;
+            public Int32 dwXCountChars;
+            public Int32 dwYCountChars;
+            public Int32 dwFillAttribute;
+            public Int32 dwFlags;
+            public Int16 wShowWindow;
+            public Int16 cbReserved2;
+            public IntPtr lpReserved2;
+            public IntPtr hStdInput;
+            public IntPtr hStdOutput;
+            public IntPtr hStdError;
+        }
+
+        [DllImport("kernel32.dll")]
+        static extern bool CreateProcess(string lpApplicationName,
+           string lpCommandLine, IntPtr lpProcessAttributes,
+           IntPtr lpThreadAttributes, bool bInheritHandles,
+           uint dwCreationFlags, IntPtr lpEnvironment, string lpCurrentDirectory,
+           [In] ref STARTUPINFO lpStartupInfo,
+           out PROCESS_INFORMATION lpProcessInformation);
+
+
+        public enum ShowCommands : int
+        {
+            SW_HIDE = 0,
+            SW_SHOWNORMAL = 1,
+            SW_NORMAL = 1,
+            SW_SHOWMINIMIZED = 2,
+            SW_SHOWMAXIMIZED = 3,
+            SW_MAXIMIZE = 3,
+            SW_SHOWNOACTIVATE = 4,
+            SW_SHOW = 5,
+            SW_MINIMIZE = 6,
+            SW_SHOWMINNOACTIVE = 7,
+            SW_SHOWNA = 8,
+            SW_RESTORE = 9,
+            SW_SHOWDEFAULT = 10,
+            SW_FORCEMINIMIZE = 11,
+            SW_MAX = 11
+        }
+
+        [DllImport("shell32.dll")]
+        static extern IntPtr ShellExecute(
+            IntPtr hwnd,
+            string lpOperation,
+            string lpFile,
+            string lpParameters,
+            string lpDirectory,
+            ShowCommands nShowCmd);
+        #endregion
     }
 
 }
