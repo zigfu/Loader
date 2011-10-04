@@ -126,8 +126,17 @@ namespace ZigLib
             //TODO: check for overwrites!
             string OutDir = Path.Combine(RootDir, Path.GetFileName(PathToZigFile));
             CreateDirRecursive(new DirectoryInfo(OutDir));
-            ExtractZip(PathToZigFile, OutDir);
-            InstalledZig iz = new InstalledZig(OutDir);
+            InstalledZig iz = null;
+            try {
+                ExtractZip(PathToZigFile, OutDir);
+                iz = new InstalledZig(OutDir);
+            }
+            catch (Exception) {
+                //failed extracting the zip or initializing the InstalledZig
+                //so unroll our actions - delete extracted files and directories
+                Directory.Delete(OutDir, true);
+                throw; // rethrow the exception
+            }
             AddInstalledZig(iz);
             return iz;
         }
