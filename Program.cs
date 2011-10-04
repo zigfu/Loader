@@ -31,17 +31,15 @@ namespace Loader
             // make the window not appear in the task bar, set it hopefully out of the screen
             // (will clean this up to make it really invisible sometime in the future)
             FormBorderStyle = FormBorderStyle.FixedToolWindow;
-            ShowInTaskbar = false;
+            
             StartPosition = FormStartPosition.Manual;
             Location = new System.Drawing.Point(-4000, -4000);
-            Size = new System.Drawing.Size(1, 1); 
-
+            Size = new System.Drawing.Size(1, 1);
             this.Load += new EventHandler(FullscreenNotifier_Loaded);
 
             container = new System.ComponentModel.Container();
 
             TrayIcon = new NotifyIcon(container);
-            TrayIcon.Visible = true;
             TrayIcon.Icon = new System.Drawing.Icon("Ninja-Toy.ico");
             TrayIcon.Text = "ZigFu loader. Having this means you're awesome!";
             TrayIcon.ContextMenuStrip = new ContextMenuStrip(container) {
@@ -77,6 +75,8 @@ namespace Loader
             if (NativeMethod.SHAppBarMessage(ABMsg.ABM_NEW, ref appBar) == 0) {
                 throw new Exception("SHAppBarMessage failed");
             }
+            TrayIcon.Visible = true;
+            ShowInTaskbar = false;// moved here to avoid losing focus when launching loader.exe from unity
         }
 
         public bool FullscreenAppOpen { get; private set; }
@@ -104,7 +104,7 @@ namespace Loader
 
         [DllImport("user32", CharSet = CharSet.Ansi, SetLastError = true, ExactSpelling = true)]
         internal static extern int AttachThreadInput(int idAttach, int idAttachTo, int fAttach);
-
+        [STAThread]
         static void Main(string[] args)
         {
             //testAutoUpdate(args);
@@ -153,7 +153,7 @@ namespace Loader
             }
 
             FullscreenNotifier f = new FullscreenNotifier();
-            f.Show();
+            //f.Show();
             OpenNIListener gestureShit = new OpenNIListener();
             gestureShit.Start();
 
@@ -199,7 +199,7 @@ namespace Loader
             );
 
             f.HandleCreated += delegate(object s, EventArgs e) { SharedObject.ServerWindowHandle = f.Handle; };
-
+            
             Application.Run(f); 
 
         }
