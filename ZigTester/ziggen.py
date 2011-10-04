@@ -7,7 +7,7 @@ from os import path
 METADATA_FILE = ".metadata"
 
 COMMAND = 'command'
-METADATA_VERSION = "1"
+METADATA_VERSION = 1.0
 
 def autodetect_os():
     if os.name == "nt":
@@ -28,7 +28,7 @@ zig_properties = [('command', str),
                           ("version", float, 0.0),
                           ("entryid", str, ""),
                           ("zigid", str, ""),
-                          ("metadata_version", str, METADATA_VERSION),
+                          ("metadata_version", float, METADATA_VERSION),
                           ]
 
 def json_from_python(some_dict):
