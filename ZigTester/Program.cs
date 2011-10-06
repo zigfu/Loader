@@ -32,7 +32,7 @@ namespace ZigTester
                 if (args[0] == "shit") {
                     if (null != last) {
                         Console.WriteLine("Doing shit (Launching last enumerated zig)");
-                        last.Launch();
+                        //last.Launch();
                     }
                     else {
                         Console.WriteLine("Sorry, but the princess is in another castle (there are no installed zigs)");

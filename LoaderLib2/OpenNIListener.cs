@@ -51,8 +51,6 @@ namespace LoaderLib2
             //Gesture.AddGesture("Click");
         }
 
-        public event EventHandler FrameCallback;
-
         public void ListenOneFrame()
         {
             context.WaitAndUpdateAll();

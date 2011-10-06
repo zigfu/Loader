@@ -58,9 +58,9 @@ namespace ZigLib
             return db.GetLocalZig(zig);
         }
 
-		public static void LaunchZig(InstalledZig zigToLaunch)
+		public static void LaunchZig(InstalledZig zigToLaunch, OpenNI.Context Context)
 		{
-            zigToLaunch.Launch();
+            zigToLaunch.Launch(Context);
 		}
 		
 		public static void RemoveZig(InstalledZig zigToRemove)

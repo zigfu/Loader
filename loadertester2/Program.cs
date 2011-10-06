@@ -10,9 +10,10 @@ namespace loadertester2
     {
         static void Main(string[] args)
         {
-            UberLib ul = new UberLib();
+            //UberLib ul = new UberLib();
             System.Threading.Thread.Sleep(1000);
-            ul.LaunchProcess(@"c:\windows\system32\notepad.exe", "");
+            //ul.LaunchProcess(@"c:\windows\system32\notepad.exe", "");
+            //API.LaunchProcess(@"c:\windows\system32\notepad.exe", "");
             Console.WriteLine("launched, hit enter to quit");
             Console.ReadLine();
         }

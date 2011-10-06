@@ -1,31 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Threading;
-
+using OpenNI;
 namespace LoaderLib2
 {
+    //TODO: make internal once everything's working
     public class UberLib
     {
-        OpenNIListener listener;
         FullscreenDetector fullscreen;
         Thread WindowThread;
         volatile bool waitingForWave = false;
         EventHandler<OpenNI.GestureRecognizedEventArgs> callback;
 
+        EventWaitHandle InitedEvent;
+        Context OpenNIContext;
+        GestureGenerator Gesture;
+
         public UberLib()
         {
-            listener = new OpenNIListener();
+            //TODO: set true somewhere else
+            InitedEvent = new EventWaitHandle(false, EventResetMode.ManualReset);
 
-            
             callback = new EventHandler<OpenNI.GestureRecognizedEventArgs>(Gesture_GestureRecognized);
-            listener.Gesture.GestureRecognized += callback;
+            
             WindowThread = new Thread(ThreadProc);
-            WindowThread.IsBackground = true;
             WindowThread.Start();
+            WindowThread.IsBackground = true;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -52,8 +55,7 @@ namespace LoaderLib2
         private void ThreadProc()
         {
             fullscreen = new FullscreenDetector();
-            ShowWindow(fullscreen.hWnd, 4); //4 == SW_SHOWNOACTIVE
-
+            InitedEvent.Set();
             NativeMessage msg;
             while (true) {
                 if (PeekMessage(out msg,
@@ -66,11 +68,10 @@ namespace LoaderLib2
                         DispatchMessage(ref msg);
                 }
                 if (waitingForWave) {
-                    listener.ListenOneFrame();
+                    OpenNIContext.WaitAndUpdateAll();
                 }
             }
         }
-
 
         // TODO: move to separate file - we need this only on windows
         [DllImport("user32.dll")]
@@ -78,29 +79,53 @@ namespace LoaderLib2
 
         Process runningProcess;
         // TODO: additional abstraction layer (this is windows-specific)
-        public void LaunchProcess(string command, string workingDir)
+        public void LaunchProcess(string command, string workingDir, Context context)
         {
-            ShitOn();
-            var CurrentProcess = Process.GetCurrentProcess();
-            runningProcess = null;
-            ShowWindow(CurrentProcess.MainWindowHandle, 11); // magic number = SW_FORCEMINIMIZE
+            ShitOn(context);
+            try {
+                var CurrentProcess = Process.GetCurrentProcess();
+                runningProcess = null;
+                ShowWindow(CurrentProcess.MainWindowHandle, 11); // magic number = SW_FORCEMINIMIZE
+                try {
+                    //TODO: ugh (change to event instead of polling)
+                    while (fullscreen.FullscreenAppOpen) {
+                        System.Threading.Thread.Sleep(100);
+                    }
 
-            //TODO: ugh (change to event instead of polling)
-            while (fullscreen.FullscreenAppOpen) {
-                System.Threading.Thread.Sleep(100);
+                    runningProcess = Process.Start(command);
+                    runningProcess.WaitForExit();
+                }
+                finally {
+                    ShowWindow(CurrentProcess.MainWindowHandle, 9); // magic number = SW_SHOW
+                }
             }
-
-            runningProcess = System.Diagnostics.Process.Start(command);
-            runningProcess.EnableRaisingEvents = true;
-            runningProcess.Exited += new EventHandler(delegate(object sender, EventArgs e) {
-                ShowWindow(CurrentProcess.MainWindowHandle, 9); // magic number = SW_SHOW
-                Console.WriteLine("removing gesture callback - happy flow");
+            finally {
                 ShitOff();
-            });
+            }
         }
-
-        private void ShitOn()
+        private ProductionNode openNode(NodeType nt)
         {
+            if (null == OpenNIContext) return null;
+
+            ProductionNode ret = null;
+            try {
+                ret = OpenNIContext.FindExistingNode(nt);
+            }
+            catch {
+                ret = OpenNIContext.CreateAnyProductionTree(nt, null);
+                Generator g = ret as Generator;
+                if (null != g) {
+                    g.StartGenerating();
+                }
+            }
+            return ret;
+        }
+        private void ShitOn(Context context)
+        {
+            OpenNIContext = context;
+            Gesture = openNode(NodeType.Gesture) as GestureGenerator;
+            Gesture.AddGesture("Wave");
+            Gesture.GestureRecognized += callback;
             waitingForWave = true;
             Console.WriteLine("what a piece of crap");
         }
@@ -108,6 +133,8 @@ namespace LoaderLib2
         private void ShitOff()
         {
             waitingForWave = false;
+            Gesture.RemoveGesture("Wave");
+            Gesture.GestureRecognized -= callback;
             Console.WriteLine("not a shit");
         }
 
@@ -117,6 +144,11 @@ namespace LoaderLib2
             if ((null != runningProcess) && (!runningProcess.HasExited)) {
                 runningProcess.Kill();
             }
+        }
+
+        internal void WaitTillInit()
+        {
+            InitedEvent.WaitOne();
         }
     }
 }

@@ -52,6 +52,10 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="OpenNI.Net, Version=1.3.2.3, Culture=neutral, PublicKeyToken=6b43d0c6cf74ee7f, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\OpenNI.Net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="Ionic.Zip, Version=1.9.1.8, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c">
       <SpecificVersion>False</SpecificVersion>
@@ -87,9 +91,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\LoaderLib\LoaderLib.csproj">
-      <Project>{EEACD462-13D2-4CF9-A249-BC9CD6A91079}</Project>
-      <Name>LoaderLib</Name>
+    <ProjectReference Include="..\LoaderLib2\LoaderLib2.csproj">
+      <Project>{F03D78C8-3CE6-44D9-80D5-74068207A62A}</Project>
+      <Name>LoaderLib2</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
