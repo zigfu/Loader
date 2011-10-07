@@ -21,13 +21,22 @@ namespace LoaderLib2
         }
 
 
-        static public void LaunchProcess(string Command, string WorkingDirectory, OpenNI.Context Context)
+        static public void LaunchProcess(string Command, string WorkingDirectory, OpenNI.Context Context, EventHandler DoneCallback)
         {
             if (Uber != null) {
                 Console.WriteLine(":)");
                 //throw new Exception("hurrah");
-                Uber.LaunchProcess(Command, WorkingDirectory, Context);
+                Uber.LaunchProcess(Command, WorkingDirectory, Context, DoneCallback);
             }
+        }
+
+        static public void Shutdown()
+        {
+            if (_Uber != null) {
+                Uber.Shutdown();
+                _Uber = null;
+            }
+
         }
     }
 }

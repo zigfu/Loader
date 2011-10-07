@@ -42,10 +42,12 @@
   <ItemGroup>
     <Compile Include="API.cs" />
     <Compile Include="FullscreenDetector.cs" />
+    <Compile Include="FullscreenTest.cs" />
     <Compile Include="OpenNIListener.cs" />
     <Compile Include="UberLib.cs" />
     <Compile Include="NativeMethod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WindowFinder.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

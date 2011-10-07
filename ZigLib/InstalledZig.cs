@@ -37,7 +37,7 @@ namespace ZigLib
         [return: MarshalAs(UnmanagedType.Bool)]
         static extern bool SetForegroundWindow(IntPtr hWnd);
 
-        public void Launch(OpenNI.Context Context)
+        public void Launch(OpenNI.Context Context, EventHandler DoneCallback)
         {
             //var RemoteAPI = LoaderLib.LoaderAPI.ConnectToServer();
             //if (null == RemoteAPI) {
@@ -47,7 +47,7 @@ namespace ZigLib
             string workingDir = Path.GetFullPath(InstallPath);
             ////TODO: make RunCommand stay relative (some minor changes to LoaderAPI required)
             //RemoteAPI.LaunchProcess(Path.Combine(workingDir, RunCommand), workingDir, System.Diagnostics.Process.GetCurrentProcess().Id);
-            LoaderLib2.API.LaunchProcess(Path.Combine(workingDir, RunCommand), workingDir, Context);
+            LoaderLib2.API.LaunchProcess(Path.Combine(workingDir, RunCommand), workingDir, Context, DoneCallback);
         }
 
         public override string ToString()

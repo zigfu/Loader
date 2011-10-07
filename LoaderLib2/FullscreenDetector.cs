@@ -177,7 +177,7 @@ namespace LoaderLib2
             }
         }
 
-        public bool FullscreenAppOpen { get; private set; }
+        public bool FullscreenAppOpen { get; set; }
 
         protected long WndProc(HWND hWnd, uint msg, int wParam, int lParam)
         {
@@ -230,6 +230,7 @@ namespace LoaderLib2
                 // unmanaged resources here.
                 // If disposing is false,
                 // only the following code is executed.
+                DestroyWindow(hWnd);
                 CloseHandle(hWnd);
                 hWnd = IntPtr.Zero;
                 UnregisterClass("SharpShellMainClass", GetModuleHandle("LoaderLib2.dll"));
@@ -243,7 +244,9 @@ namespace LoaderLib2
         // to clean up the unmanaged resource.
         [System.Runtime.InteropServices.DllImport("Kernel32")]
         private extern static Boolean CloseHandle(IntPtr handle);
-
+        [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool DestroyWindow(IntPtr hwnd);
         // Use C# destructor syntax for finalization code.
         // This destructor will run only if the Dispose method
         // does not get called.

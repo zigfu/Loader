@@ -22,12 +22,12 @@ namespace loadertester2
             //UberLib ul = new UberLib();
             System.Threading.Thread.Sleep(1000);
             //ul.LaunchProcess(@"c:\windows\system32\notepad.exe", "");
-            API.LaunchProcess(@"D:\work\launchprocesstest\dummyfullscreen.exe", "", context);
-            Console.WriteLine("quit 1");
-            API.LaunchProcess(@"D:\work\launchprocesstest\dummyfullscreen.exe", "", context);
-            Console.WriteLine("quit 2");
-            API.LaunchProcess(@"D:\work\launchprocesstest\dummyfullscreen.exe", "", context);
-            Console.WriteLine("quit 3");
+            //API.LaunchProcess(@"D:\work\launchprocesstest\dummyfullscreen.exe", "", context, false);
+            //Console.WriteLine("quit 1");
+            //API.LaunchProcess(@"D:\work\launchprocesstest\dummyfullscreen.exe", "", context, false);
+            //Console.WriteLine("quit 2");
+            //API.LaunchProcess(@"D:\work\launchprocesstest\dummyfullscreen.exe", "", context, false);
+            //Console.WriteLine("quit 3");
             Console.ReadLine();
         }
     }
