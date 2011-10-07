@@ -105,16 +105,13 @@ namespace LoaderLib2
                     //var CurrentProcess = Process.GetCurrentProcess();
                     //IntPtr WindowHandle = CurrentProcess.MainWindowHandle;
                     IntPtr WindowHandle = HwndEnumerator.MainWindowOfPid((int)GetCurrentProcessId());
-                    Console.WriteLine("asdf1: " + WindowHandle);
                     ShowWindow(WindowHandle, 11); // magic number = SW_FORCEMINIMIZE
-                    Console.WriteLine("fdsa");
                     try {
                         //TODO: ugh (change to event instead of polling)
                         //while (fullscreen.FullscreenAppOpen) {
                         while (MyClass.isFullscreen(WindowHandle)) {
                             System.Threading.Thread.Sleep(100);
                         }
-                        Console.WriteLine("hjkl");
                         lock (this) {
                             runningProcess = Process.Start(command);
                         }
@@ -123,7 +120,6 @@ namespace LoaderLib2
                         }
                     }
                     finally {
-                        HwndEnumerator.Update();
                         ShowWindow(WindowHandle, 9); // magic number = SW_RESTORE
                     }
                 }
@@ -162,7 +158,6 @@ namespace LoaderLib2
             lock (this) {
                 waitingForWave = true;
             }
-            Console.WriteLine("what a piece of crap");
         }
 
         private void ShitOff()
@@ -172,12 +167,10 @@ namespace LoaderLib2
             }
             Gesture.RemoveGesture("Wave");
             Gesture.GestureRecognized -= callback;
-            Console.WriteLine("not a shit");
         }
 
         void Gesture_GestureRecognized(object sender, OpenNI.GestureRecognizedEventArgs e)
         {
-            Console.WriteLine("shit on a stick");
             lock (this) {
                 if ((null != runningProcess) && (!runningProcess.HasExited)) {
                     runningProcess.Kill();

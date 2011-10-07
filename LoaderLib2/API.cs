@@ -24,7 +24,6 @@ namespace LoaderLib2
         static public void LaunchProcess(string Command, string WorkingDirectory, OpenNI.Context Context, EventHandler DoneCallback)
         {
             if (Uber != null) {
-                Console.WriteLine(":)");
                 //throw new Exception("hurrah");
                 Uber.LaunchProcess(Command, WorkingDirectory, Context, DoneCallback);
             }
