@@ -75,6 +75,10 @@ namespace LoaderLib2
             IntPtr hInstance,
             IntPtr lpParam);
 
+        WndClassEx wndClassEx; // IMPORTANT - otherwise the windowclass object will get GC'd
+                               // and then the delegate we passed for the windowproc will be
+                               // invalidated
+
         [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
         public static extern IntPtr GetModuleHandle(string lpModuleName);
         private IntPtr GetWindowHandle()
@@ -88,7 +92,7 @@ namespace LoaderLib2
 
             //Hope this works.
             //Create our window class
-            WndClassEx wndClassEx = new WndClassEx() {
+            wndClassEx = new WndClassEx() {
                 cbSize = (uint)Marshal.SizeOf(typeof(WndClassEx)),
                 style = ClassStyles.GlobalClass,
                 cbClsExtra = 0,
@@ -132,7 +136,7 @@ namespace LoaderLib2
         }
 
         private uint CallBackMessage;
-private  bool disposed;
+        private bool disposed;
         public HWND hWnd { get; private set; }
 
         public FullscreenDetector()
