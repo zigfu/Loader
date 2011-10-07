@@ -64,13 +64,16 @@ namespace LoaderLib2
                     0,
                     1 //PM_REMOVE
                     )) {
-                        TranslateMessage(ref msg);
-                        DispatchMessage(ref msg);
+                    TranslateMessage(ref msg);
+                    DispatchMessage(ref msg);
                 }
-                if (waitingForWave) {
-                    OpenNIContext.WaitAndUpdateAll();
+                lock (this) {
+                    if (waitingForWave) {
+                        OpenNIContext.WaitAndUpdateAll();
+                    }
                 }
             }
+
         }
 
         // TODO: move to separate file - we need this only on windows
@@ -84,15 +87,18 @@ namespace LoaderLib2
             ShitOn(context);
             try {
                 var CurrentProcess = Process.GetCurrentProcess();
-                runningProcess = null;
+                lock (this) {
+                    runningProcess = null;
+                }
                 ShowWindow(CurrentProcess.MainWindowHandle, 11); // magic number = SW_FORCEMINIMIZE
                 try {
                     //TODO: ugh (change to event instead of polling)
                     while (fullscreen.FullscreenAppOpen) {
                         System.Threading.Thread.Sleep(100);
                     }
-
-                    runningProcess = Process.Start(command);
+                    lock (this) {
+                        runningProcess = Process.Start(command);
+                    }
                     runningProcess.WaitForExit();
                 }
                 finally {
@@ -126,13 +132,17 @@ namespace LoaderLib2
             Gesture = openNode(NodeType.Gesture) as GestureGenerator;
             Gesture.AddGesture("Wave");
             Gesture.GestureRecognized += callback;
-            waitingForWave = true;
+            lock (this) {
+                waitingForWave = true;
+            }
             Console.WriteLine("what a piece of crap");
         }
 
         private void ShitOff()
         {
-            waitingForWave = false;
+            lock (this) {
+                waitingForWave = false;
+            }
             Gesture.RemoveGesture("Wave");
             Gesture.GestureRecognized -= callback;
             Console.WriteLine("not a shit");
@@ -141,8 +151,10 @@ namespace LoaderLib2
         void Gesture_GestureRecognized(object sender, OpenNI.GestureRecognizedEventArgs e)
         {
             Console.WriteLine("shit on a stick");
-            if ((null != runningProcess) && (!runningProcess.HasExited)) {
-                runningProcess.Kill();
+            lock (this) {
+                if ((null != runningProcess) && (!runningProcess.HasExited)) {
+                    runningProcess.Kill();
+                }
             }
         }
 
