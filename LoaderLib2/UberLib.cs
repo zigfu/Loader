@@ -172,6 +172,9 @@ namespace LoaderLib2
         void Gesture_GestureRecognized(object sender, OpenNI.GestureRecognizedEventArgs e)
         {
             lock (this) {
+                if (e.Gesture != "Wave") {
+                    return;
+                }
                 if ((null != runningProcess) && (!runningProcess.HasExited)) {
                     runningProcess.Kill();
                 }
