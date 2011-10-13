@@ -4,6 +4,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Threading;
+using System.Media;
 using OpenNI;
 namespace LoaderLib2
 {
@@ -19,6 +20,10 @@ namespace LoaderLib2
         Context OpenNIContext;
         GestureGenerator Gesture;
         WindowFinder HwndEnumerator;
+
+        private SoundPlayer FirstPhaseSound;
+        private SoundPlayer SecondPhaseSound;
+
         public UberLib()
         {
             //TODO: set true somewhere else
@@ -30,6 +35,9 @@ namespace LoaderLib2
             //WindowThread.Start();
             //WindowThread.IsBackground = true;
             HwndEnumerator = new WindowFinder();
+
+            FirstPhaseSound = new SoundPlayer("first.wav");
+            SecondPhaseSound = new SoundPlayer("second.wav");
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -112,8 +120,10 @@ namespace LoaderLib2
                         while (MyClass.isFullscreen(WindowHandle)) {
                             System.Threading.Thread.Sleep(100);
                         }
+                        ProcessStartInfo psi = new ProcessStartInfo(command);
+                        psi.WorkingDirectory = workingDir;
                         lock (this) {
-                            runningProcess = Process.Start(command);
+                            runningProcess = Process.Start(psi);
                         }
                         while (!runningProcess.HasExited) {
                             OpenNIContext.WaitAndUpdateAll();
@@ -154,6 +164,7 @@ namespace LoaderLib2
             OpenNIContext = context;
             Gesture = openNode(NodeType.Gesture) as GestureGenerator;
             Gesture.AddGesture("Wave");
+            Gesture.AddGesture("Click");
             Gesture.GestureRecognized += callback;
             lock (this) {
                 waitingForWave = true;
@@ -165,18 +176,28 @@ namespace LoaderLib2
             lock (this) {
                 waitingForWave = false;
             }
-            Gesture.RemoveGesture("Wave");
+            //Gesture.RemoveGesture("Wave");
             Gesture.GestureRecognized -= callback;
         }
-
+        long lastDetectedWave = 0;
+        const long WAVE_CLICK_TIME_DELTA = 4000;
         void Gesture_GestureRecognized(object sender, OpenNI.GestureRecognizedEventArgs e)
         {
+            
             lock (this) {
-                if (e.Gesture != "Wave") {
+                if (e.Gesture == "Wave") {
+                    lastDetectedWave = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+                    FirstPhaseSound.Play();
                     return;
                 }
-                if ((null != runningProcess) && (!runningProcess.HasExited)) {
-                    runningProcess.Kill();
+                else if (e.Gesture == "Click") {
+                    long currentMS = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+                    if ((currentMS - lastDetectedWave) < WAVE_CLICK_TIME_DELTA) {
+                        SecondPhaseSound.PlaySync();
+                        if ((null != runningProcess) && (!runningProcess.HasExited)) {
+                            runningProcess.Kill();
+                        }
+                    }
                 }
             }
         }
