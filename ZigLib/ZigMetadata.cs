@@ -16,6 +16,7 @@ namespace ZigLib
         public const string RATING = "rating";
         public const string THUMBNAIL_PATH = "thumbnail_path";
         public const string COMMAND = "command";
+        public const string WORKING_DIRECTORY = "working_dir";
     }
 
     public class SharedMetadata
